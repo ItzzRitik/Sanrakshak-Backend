@@ -34,39 +34,50 @@ app.get("/connect", function(req, res) {
 app.get("/check", function(req, res) {
     var email = req.query.email;
     User.find({ email: email }, function(e, user) {
-        if (e) { console.log("Error occured while checking for email.\n" + e); }
+        if (e) { console.log("Error occured while checking for email :\n" + e); }
         else {
-            if (user.length) { res.send("1"); }
-            else { res.send("0"); }
+            if (user.length) {
+                res.send("1");
+                console.log("\"" + email + "\" exists in database");
+                console.log("Initiating login");
+            }
+            else {
+                res.send("0");
+                console.log("\"" + email + "\" doesn't exists in database");
+                console.log("Initiating user creation");
+            }
         }
     });
 });
 
 app.get("/login", function(req, res) {
-    console.log(req.query.email);
-    console.log(req.query.pass);
-    // var email = crypt.decryptCipherTextWithRandomIV(req.query.email, "sanrakshak");
-    // var pass = crypt.decryptCipherTextWithRandomIV(req.query.pass, "sanrakshak");
-    // console.log("Encrypted Email : " + req.query.email);
-    // console.log("Decrypted Email : " + email);
-    // console.log("Encrypted Password : " + req.query.pass);
-    // console.log("Decrypted Password : " + pass);
-    // User.find({ email: email }, function(e, user) {
-    //     if (e) {
-    //         console.log("Error occured while logging in.\n" + e);
-    //     }
-    //     else if (user.length) {
-    //         if (user[0].pass == pass) {
-    //             res.send("1");
-    //         }
-    //         else {
-    //             res.send("0");
-    //         }
-    //     }
-    //     else {
-    //         res.send("0");
-    //     }
-    // });
+    var email = req.query.email;
+    var pass = req.query.pass;
+    try {
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+    }
+    catch (e) {
+        console.log("Error occured while decrypting data :\n" + e);
+        res.send("0");
+        return;
+    }
+    User.find({ email: email }, function(e, user) {
+        if (e) {
+            console.log("Error occured while logging in :\n" + e);
+        }
+        else if (user.length) {
+            if (user[0].pass == pass) {
+                res.send("1");
+            }
+            else {
+                res.send("0");
+            }
+        }
+        else {
+            res.send("0");
+        }
+    });
 });
 
 app.get("/signup", function(req, res) {
@@ -95,11 +106,11 @@ app.get("/dropusers", function(req, res) {
     db.dropCollection("users", function(err, result) {
         if (err) {
             res.send("0");
-            console.log("error delete collection");
+            console.log("Error delete collection");
         }
         else {
             res.send("1");
-            console.log("delete collection success");
+            console.log("Delete collection success");
         }
     });
 });
