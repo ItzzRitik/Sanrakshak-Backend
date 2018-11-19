@@ -34,7 +34,7 @@ app.get("/connect", function(req, res) {
         device = crypt.decryptCipherTextWithRandomIV(device, "sanrakshak");
     }
     catch (e) {
-        console.log("Error occured while decrypting device name :\n" + e);
+        console.log(">  Error occured while decrypting device name :\n>  " + e);
         res.send("1");
         return;
     }
@@ -85,18 +85,18 @@ app.get("/login", function(req, res) {
         else if (user.length) {
             if (user[0].pass == pass) {
                 res.send("1");
-                console.log(">  Password is correct");
-                console.log(">  Authentication successfull\n");
+                console.log(">  Valid Password");
+                console.log(">  Authentication successfull");
             }
             else {
                 res.send("0");
-                console.log(">  Password doesn't match");
-                console.log(">  Login Terminated\n");
+                console.log(">  Invalid Password");
+                console.log(">  Authentication Terminated");
             }
         }
         else {
             res.send("0");
-            console.log(">  User doesn't exist\n");
+            console.log(">  User doesn't exist");
         }
     });
 });
@@ -129,7 +129,7 @@ app.get("/signup", function(req, res) {
         }
         else {
             res.send("1");
-            console.log(">  Account Successfully Created\n");
+            console.log(">  Account Successfully Created");
         }
     });
 });
