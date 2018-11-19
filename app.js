@@ -6,6 +6,7 @@ var fs = require("fs");
 var multer = require('multer');
 var crypt = require('cryptlib');
 var db = mongoose.connection;
+var call = 0;
 
 mongoose.connect("mongodb://localhost/sanrakshak", { useNewUrlParser: true });
 app.set("view engine", "ejs");
@@ -28,23 +29,36 @@ var UserSchema = new mongoose.Schema({
 var User = mongoose.model("users", UserSchema);
 
 app.get("/connect", function(req, res) {
+    var device = req.query.device;
+    try {
+        device = crypt.decryptCipherTextWithRandomIV(device, "sanrakshak");
+    }
+    catch (e) {
+        console.log("Error occured while decrypting device name :\n" + e);
+        res.send("1");
+        return;
+    }
+
+    console.log("\n" + ++call + ") Device Connected");
+    console.log(">  " + device);
     res.send("1");
 });
 
 app.get("/check", function(req, res) {
     var email = req.query.email;
+    console.log("\n" + ++call + ") Account Checkup");
     User.find({ email: email }, function(e, user) {
-        if (e) { console.log("Error occured while checking for email :\n" + e); }
+        if (e) { console.log(">  Error occured while checking for email :\n>  " + e); }
         else {
             if (user.length) {
                 res.send("1");
-                console.log("\"" + email + "\" exists in database");
-                console.log("Initiating login");
+                console.log(">  \"" + email + "\" exists in database");
+                console.log(">  Login Initiated");
             }
             else {
                 res.send("0");
-                console.log("\"" + email + "\" doesn't exists in database");
-                console.log("Initiating user creation");
+                console.log(">  \"" + email + "\" doesn't exists in database");
+                console.log(">  Account creation Initiated");
             }
         }
     });
@@ -53,33 +67,36 @@ app.get("/check", function(req, res) {
 app.get("/login", function(req, res) {
     var email = req.query.email;
     var pass = req.query.pass;
-    console.log("Encrypted Email : " + email);
-    console.log("Encrypted Password : " + pass);
+    console.log("\n" + ++call + ") Authentication Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        console.log("Email : " + email + "\nEncrypted Password : " + pass);
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
-        console.log("Encrypted Email : " + email);
-        console.log("Encrypted Password : " + pass);
     }
     catch (e) {
-        console.log("Error occured while decrypting data :\n" + e);
+        console.log(">  Error occured while decrypting data :\n>  " + e);
         res.send("0");
         return;
     }
     User.find({ email: email }, function(e, user) {
         if (e) {
-            console.log("Error occured while logging in :\n" + e);
+            console.log(">  Error occured while logging in :\n>  " + e);
         }
         else if (user.length) {
             if (user[0].pass == pass) {
                 res.send("1");
+                console.log(">  Password is correct");
+                console.log(">  Authentication successfull\n");
             }
             else {
                 res.send("0");
+                console.log(">  Password doesn't match");
+                console.log(">  Login Terminated\n");
             }
         }
         else {
             res.send("0");
+            console.log(">  User doesn't exist\n");
         }
     });
 });
@@ -87,6 +104,17 @@ app.get("/login", function(req, res) {
 app.get("/signup", function(req, res) {
     var email = req.query.email;
     var pass = req.query.pass;
+    console.log("\n" + ++call + ") Account Creation Started");
+    try {
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        console.log("Email : " + email + "\nEncrypted Password : " + pass);
+        pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
     User.create({
         email: email,
         pass: pass,
@@ -97,11 +125,11 @@ app.get("/signup", function(req, res) {
     }, function(e, user) {
         if (e) {
             res.send("0");
-            console.log("Error occured while creating user.\n" + e);
+            console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
             res.send("1");
-            console.log("User created : " + user.email);
+            console.log(">  Account Successfully Created\n");
         }
     });
 });
