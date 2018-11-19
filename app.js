@@ -14,8 +14,27 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get("/", function(req, res) {
-    res.send("home");
+var UserSchema = new mongoose.Schema({
+    email: String,
+    pass: String,
+    fname: String,
+    lname: String,
+    gender: String,
+    dob: String
+});
+var User = mongoose.model("User", UserSchema);
+
+app.get("/check", function(req, res) {
+    var email = req.query.email;
+    User.find({ email: email }, function(err, user) {
+        if (err) {
+            console.log("Error occured while checking for email.\n" + err);
+        }
+        else {
+            if (user.length) { res.send("1"); }
+            else { res.send("0"); }
+        }
+    });
 });
 
 app.listen(8080, function() {
