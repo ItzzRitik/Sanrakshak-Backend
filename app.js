@@ -4,7 +4,7 @@ var BodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var fs = require("fs");
 var multer = require('multer');
-var Blowfish = require('egoroof-blowfish');
+var crypt = require('cryptlib');
 var db = mongoose.connection;
 
 mongoose.connect("mongodb://localhost/sanrakshak", { useNewUrlParser: true });
@@ -56,9 +56,10 @@ app.get("/login", function(req, res) {
     console.log("Encrypted Email : " + email);
     console.log("Encrypted Password : " + pass);
     try {
-        var bf = new Blowfish("sanrakshak");
-        email = bf.decrypt(email);
-        pass = bf.decrypt(pass);
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+        console.log("Encrypted Email : " + email);
+        console.log("Encrypted Password : " + pass);
     }
     catch (e) {
         console.log("Error occured while decrypting data :\n" + e);
