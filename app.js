@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const BodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const nodemailer = require('nodemailer');
 const crypt = require('./CryptLib');
 const clear = require('clear');
 const git = require('simple-git/promise')();
@@ -33,7 +34,8 @@ var UserSchema = new mongoose.Schema({
     fname: String,
     lname: String,
     gender: String,
-    dob: String
+    dob: String,
+    verified: String
 });
 var User = mongoose.model("users", UserSchema);
 
@@ -148,7 +150,8 @@ app.post("/signup", function(req, res) {
         fname: "",
         lname: "",
         gender: "",
-        dob: ""
+        dob: "",
+        verified: "0"
     }, function(e, user) {
         if (e) {
             res.send("0");
