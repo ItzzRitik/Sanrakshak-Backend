@@ -133,11 +133,14 @@ app.post("/login", function(req, res) {
 app.post("/signup", function(req, res) {
     var email = req.body.email;
     var pass = req.body.pass;
+    var senderemail = "itzzritikhax@gmail.com";
+    var senderpass = "CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log("Email : " + email + "\nEncrypted Password : " + pass);
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+        senderpass = crypt.decryptCipherTextWithRandomIV(senderpass, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -158,44 +161,15 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            nodemailer.createTestAccount((e, account) => {
-                e =>{
-                    
-                };
-                // create reusable transporter object using the default SMTP transport
-                let transporter = nodemailer.createTransport({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    secure: false, // true for 465, false for other ports
-                    auth: {
-                        user: account.user, // generated ethereal user
-                        pass: account.pass // generated ethereal password
-                    }
-                });
-
-                // setup email data with unicode symbols
-                let mailOptions = {
-                    from: '"Hello 👻" <cto@sanrakshak.in>', // sender address
-                    to: email, // list of receivers
-                    subject: 'Hello ✔', // Subject line
-                    text: 'Hello world?', // plain text body
-                    html: '<b>Hello world?</b>' // html body
-                };
-
-                // send mail with defined transport object
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        return console.log(error);
-                    }
-                    console.log('Message sent: %s', info.messageId);
-                    // Preview only available when sending through an Ethereal account
-                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
-                    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-                    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-                });
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: senderemail,
+                    pass: senderpass
+                }
             });
             res.send("1");
+            console.log("transporter");
             console.log(">  Account Successfully Created");
         }
     });
