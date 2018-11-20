@@ -180,22 +180,22 @@ app.get("/git", function(req, res) {
     git.add('.')
         .then(
             (addSuccess) => {
-                console.log(">  Added Changes to Stack\n>  " + addSuccess);
+                console.log(">  Changes Added to Stack");
             }, (failedAdd) => {
-                console.log(">  Adding Files Failed\n>  " + failedAdd);
+                console.log(">  Changes Adding Failed\n>  " + failedAdd);
             });
     git.commit(m)
         .then(
             (successCommit) => {
-                console.log(">   Changes Commited\n>  " + successCommit);
+                console.log(">   Changes Commited With Message \"" + m + "\"");
             }, (failed) => {
-                console.log(">  Commit Failed\n>  " + failed);
+                console.log(">  Changes Commit Failed\n>  " + failed);
             });
     git.push('origin', 'master')
         .then((success) => {
-            console.log(">   Pushed to Origin Master\n>  " + success);
+            console.log(">   Changes Pushed to Origin Master\n>  " + success);
         }, (failed) => {
-            console.log(">  Push Failed\n>  " + failed);
+            console.log(">  Changes Push Failed\n>  " + failed);
         });
 
 });
