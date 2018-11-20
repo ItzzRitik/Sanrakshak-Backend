@@ -193,7 +193,7 @@ app.get("/git", function(req, res) {
             });
     git.push('origin', 'master')
         .then((success) => {
-            console.log(">  Changes Pushed to Origin Master>  " + success);
+            console.log(">  Changes Pushed to Origin Master");
         }, (failed) => {
             console.log(">  Changes Push Failed\n>  " + failed);
         });
