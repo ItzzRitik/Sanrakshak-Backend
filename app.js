@@ -190,7 +190,7 @@ app.get("/git", function(req, res) {
     git.commit(m)
         .then(
             (successCommit) => {
-                console.log(">  Changes Successfully Commited With Message \"" + m + "\"");
+                console.log(">  Changes Successfully Commited With Message\n   >  \"" + m + "\"");
             }, (failed) => {
                 console.log(">  Changes Commit Failed\n>  " + failed);
             });
