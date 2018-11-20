@@ -4,7 +4,7 @@ var BodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var fs = require("fs");
 var multer = require('multer');
-var crypt = require('cryptlib');
+var crypt = require('./CryptLib');
 var db = mongoose.connection;
 var call = 0;
 
