@@ -8,7 +8,17 @@ var crypt = require('./CryptLib');
 var db = mongoose.connection;
 var call = 0;
 
-mongoose.connect("mongodb://localhost/sanrakshak", { useNewUrlParser: true });
+const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
+const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
+mongoose.connect(dbURI, dbOptions).then(
+    () => {
+        console.log(">  Connection Established");
+    },
+    e => {
+        console.log(">  Connection Failed \n>  " + e);
+    }
+);
+
 app.set("view engine", "ejs");
 app.use(BodyParser.urlencoded({ extended: true }));
 
@@ -152,5 +162,7 @@ app.get("*", function(req, res) {
 });
 
 app.listen(8080, function() {
-    console.log("Server is Listening!!!");
+    console.log("\n" + ++call + ") Starting Server");
+    console.log(">  Server is Listening");
+    console.log("\n" + ++call + ") Connection to MongoDB Atlas Server");
 });
