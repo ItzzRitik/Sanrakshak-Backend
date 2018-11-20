@@ -176,25 +176,26 @@ app.get("/dropusers", function(req, res) {
 
 app.get("/git", function(req, res) {
     var m = req.query.m;
+    console.log("\n" + ++call + ") Pushing to Github");
     git.add('.')
         .then(
             (addSuccess) => {
-                console.log(addSuccess);
+                console.log(">  Added Changes to Stack\n>  " + addSuccess);
             }, (failedAdd) => {
-                console.log('adding files failed');
+                console.log(">  Adding Files Failed\n>  " + failedAdd);
             });
     git.commit(m)
         .then(
             (successCommit) => {
-                console.log(successCommit);
+                console.log(">   Changes Commited\n>  " + successCommit);
             }, (failed) => {
-                console.log('failed commmit');
+                console.log(">  Commit Failed\n>  " + failed);
             });
     git.push('origin', 'master')
         .then((success) => {
-            console.log(success);
+            console.log(">   Pushed to Origin Master\n>  " + success);
         }, (failed) => {
-            console.log('repo push failed');
+            console.log(">  Push Failed\n>  " + failed);
         });
 
 });
