@@ -183,24 +183,24 @@ app.get("/git", function(req, res) {
     git.add('.')
         .then(
             (addSuccess) => {
-                console.log(">  Changes Added to Stack");
+                console.log(">  Changes Successfully Added to Stack");
             }, (failedAdd) => {
                 console.log(">  Changes Adding Failed\n>  " + failedAdd);
             });
     git.commit(m)
         .then(
             (successCommit) => {
-                console.log(">  Changes Commited With Message \"" + m + "\"");
+                console.log(">  Changes Successfully Commited With Message \"" + m + "\"");
             }, (failed) => {
                 console.log(">  Changes Commit Failed\n>  " + failed);
             });
     git.push('origin', 'master')
         .then((success) => {
-            console.log(">  Changes Pushed to Origin Master");
+            console.log(">  Changes Successfully Pushed to Origin Master");
         }, (failed) => {
             console.log(">  Changes Push Failed\n>  " + failed);
         });
-
+    res.send("1");
 });
 
 app.get("*", function(req, res) {
