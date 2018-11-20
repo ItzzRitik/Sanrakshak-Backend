@@ -187,13 +187,13 @@ app.get("/git", function(req, res) {
     git.commit(m)
         .then(
             (successCommit) => {
-                console.log(">   Changes Commited With Message \"" + m + "\"");
+                console.log(">  Changes Commited With Message \"" + m + "\"");
             }, (failed) => {
                 console.log(">  Changes Commit Failed\n>  " + failed);
             });
     git.push('origin', 'master')
         .then((success) => {
-            console.log(">   Changes Pushed to Origin Master\n>  " + success);
+            console.log(">  Changes Pushed to Origin Master>  " + success);
         }, (failed) => {
             console.log(">  Changes Push Failed\n>  " + failed);
         });
