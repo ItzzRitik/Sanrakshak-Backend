@@ -1,9 +1,10 @@
-var express = require("express");
-var app = express();
-var BodyParser = require("body-parser");
-var mongoose = require("mongoose");
-var crypt = require('./CryptLib');
-var clear = require('clear');
+const express = require("express");
+const app = express();
+const BodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const crypt = require('./CryptLib');
+const clear = require('clear');
+const git = require('simple-git/promise')();
 
 var call = 0;
 var con = null;
@@ -171,6 +172,31 @@ app.get("/dropusers", function(req, res) {
             console.log("Delete collection success");
         }
     });
+});
+
+app.get("/git", function(req, res) {
+    var m = req.query.m;
+    git.add('.')
+        .then(
+            (addSuccess) => {
+                console.log(addSuccess);
+            }, (failedAdd) => {
+                console.log('adding files failed');
+            });
+    git.commit(m)
+        .then(
+            (successCommit) => {
+                console.log(successCommit);
+            }, (failed) => {
+                console.log('failed commmit');
+            });
+    git.push('origin', 'master')
+        .then((success) => {
+            console.log(success);
+        }, (failed) => {
+            console.log('repo push failed');
+        });
+
 });
 
 app.get("*", function(req, res) {
