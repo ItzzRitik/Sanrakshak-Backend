@@ -162,6 +162,9 @@ app.get("*", function(req, res) {
 });
 
 app.listen(8080, function() {
+    console.reset = function() {
+        return process.stdout.write('\033c');
+    }
     console.log("\n" + ++call + ") Starting Server");
     console.log(">  Server is Listening");
     console.log("\n" + ++call + ") Connection to MongoDB Atlas Server");
