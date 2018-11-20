@@ -7,9 +7,6 @@ var multer = require('multer');
 var crypt = require('./CryptLib');
 var clear = require('clear');
 
-var db = mongoose.connection;
-var call = 0;
-
 const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
 mongoose.connect(dbURI, dbOptions).then(
@@ -20,6 +17,8 @@ mongoose.connect(dbURI, dbOptions).then(
         console.log(">  Connection Failed \n>  " + e);
     }
 );
+
+var call = 0;
 
 app.set("view engine", "ejs");
 app.use(BodyParser.urlencoded({ extended: true }));
@@ -147,7 +146,7 @@ app.get("/signup", function(req, res) {
 });
 
 app.get("/dropusers", function(req, res) {
-    db.dropCollection("users", function(err, result) {
+    mongoose.connection.dropCollection("users", function(err, result) {
         if (err) {
             res.send("0");
             console.log("Error delete collection");
@@ -165,7 +164,6 @@ app.get("*", function(req, res) {
 
 app.listen(8080, function() {
     clear();
-
     console.log("\n" + ++call + ") Starting Server");
     console.log(">  Server is Listening");
     console.log("\n" + ++call + ") Connection to MongoDB Atlas Server");
