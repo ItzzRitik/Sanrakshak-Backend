@@ -3,6 +3,7 @@ const app = express();
 const BodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
+const js = require('./Functions');
 const crypt = require('./CryptLib');
 const clear = require('clear');
 const git = require('simple-git/promise')();
@@ -158,6 +159,14 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
+            js.sendVerificationMail(nodemailer, email, function(err, result) {
+                if (err) {
+                    // login did not succeed
+                }
+                else {
+                    // login successful
+                }
+            });
             res.send("1");
             console.log(">  Account Successfully Created");
         }
