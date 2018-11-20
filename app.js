@@ -2,10 +2,11 @@ var express = require("express");
 var app = express();
 var BodyParser = require("body-parser");
 var mongoose = require("mongoose");
-var fs = require("fs");
-var multer = require('multer');
 var crypt = require('./CryptLib');
 var clear = require('clear');
+
+var call = 0;
+var con = null;
 
 const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
@@ -18,11 +19,7 @@ mongoose.connect(dbURI, dbOptions).then(
     }
 );
 
-var call = 0;
-
-app.set("view engine", "ejs");
 app.use(BodyParser.urlencoded({ extended: true }));
-
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -39,25 +36,45 @@ var UserSchema = new mongoose.Schema({
 });
 var User = mongoose.model("users", UserSchema);
 
-app.get("/connect", function(req, res) {
-    var device = req.query.device;
-    try {
-        device = crypt.decryptCipherTextWithRandomIV(device, "sanrakshak");
+//Routes
+app.post("/connect", function(req, res) {
+    if (mongoose.connection.readyState == 2) {
+        console.log(">  Connection Request Recieved");
     }
-    catch (e) {
-        console.log(">  Error occured while decrypting device name :\n>  " + e);
-        res.send("1");
-        return;
-    }
-
-    console.log("\n" + ++call + ") Device Connected");
-    console.log(">  " + device);
-    res.send("1");
+    con = setInterval(function sendEmail() {
+        if (mongoose.connection.readyState == 1) {
+            var device = req.body.device;
+            try {
+                device = crypt.decryptCipherTextWithRandomIV(device, "sanrakshak");
+            }
+            catch (e) {
+                console.log(">  Error occured while decrypting device name :\n>  " + e);
+                res.send("1");
+                clearInterval(con);
+            }
+            console.log("\n" + ++call + ") Device Connected");
+            console.log(">  " + device);
+            res.send("1");
+            clearInterval(con);
+        }
+        else if (mongoose.connection.readyState == 0) {
+            res.send("0");
+            clearInterval(con);
+        }
+    }, 1000);
 });
 
-app.get("/check", function(req, res) {
-    var email = req.query.email;
-    console.log("\n" + ++call + ") Account Checkup");
+app.post("/check", function(req, res) {
+    var email = req.body.email;
+    console.log("\n" + ++call + ") Searching For Account");
+    try {
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
     User.find({ email: email }, function(e, user) {
         if (e) { console.log(">  Error occured while checking for email :\n>  " + e); }
         else {
@@ -75,9 +92,9 @@ app.get("/check", function(req, res) {
     });
 });
 
-app.get("/login", function(req, res) {
-    var email = req.query.email;
-    var pass = req.query.pass;
+app.post("/login", function(req, res) {
+    var email = req.body.email;
+    var pass = req.body.pass;
     console.log("\n" + ++call + ") Authentication Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -96,25 +113,23 @@ app.get("/login", function(req, res) {
         else if (user.length) {
             if (user[0].pass == pass) {
                 res.send("1");
-                console.log(">  Valid Password");
                 console.log(">  Authentication successfull");
             }
             else {
                 res.send("0");
-                console.log(">  Invalid Password");
-                console.log(">  Authentication Terminated");
+                console.log(">  Authentication Terminated: Invalid Password");
             }
         }
         else {
             res.send("0");
-            console.log(">  User doesn't exist");
+            console.log(">  Authentication Terminated: User doesn't exist");
         }
     });
 });
 
-app.get("/signup", function(req, res) {
-    var email = req.query.email;
-    var pass = req.query.pass;
+app.post("/signup", function(req, res) {
+    var email = req.body.email;
+    var pass = req.body.pass;
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
