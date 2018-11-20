@@ -168,8 +168,19 @@ app.post("/signup", function(req, res) {
                     pass: senderpass
                 }
             });
+            const mailOptions = {
+                from: senderemail,
+                to: email,
+                subject: "Email Verification",
+                html: "<p>Your html here</p>"
+            };
+            transporter.sendMail(mailOptions, function(err, info) {
+                if (err)
+                    console.log(err)
+                else
+                    console.log(info);
+            });
             res.send("1");
-            console.log("transporter");
             console.log(">  Account Successfully Created");
         }
     });
