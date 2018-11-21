@@ -40,7 +40,8 @@ module.exports = {
         console.log(e);
       }
       else {
-        res.send("1");
+        console.log(body);
+        res.send("0");
       }
     });
   }
