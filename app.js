@@ -160,7 +160,7 @@ app.post("/signup", function(req, res) {
         }
         else {
             console.log("Token : " + token);
-            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
+            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + token;
             tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
