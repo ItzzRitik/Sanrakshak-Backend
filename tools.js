@@ -27,14 +27,14 @@ module.exports = {
       }
     });
   },
-  sendMail: function(mailgun, email) {
+  sendMail: function(mailgun, email, res) {
     var data = {
       from: "Sanrakshak <verify@sanrakshak.in>",
       to: email,
       subject: "Hello",
       text: "Testing some Mailgun awesomeness!"
     };
-    mailgun.messages().send(data, function(e, body, res) {
+    mailgun.messages().send(data, function(e, body) {
       if (e) {
         res.send("0");
         console.log(e);
