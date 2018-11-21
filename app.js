@@ -102,7 +102,7 @@ app.post("/login", function(req, res) {
     console.log("\n" + ++call + ") Authentication Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email : " + email + "\nEncrypted Password : " + pass);
+        console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
     }
     catch (e) {
@@ -135,11 +135,11 @@ app.post("/signup", function(req, res) {
     var email = req.body.email;
     var pass = req.body.pass;
     var senderemail = "itzzritikhax@gmail.com";
-    var senderpass = "CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
+    var senderpass = "OhaCqH7ZyL7mA115EoxXa7M3SAoHEx3aep5Mz06uGKk="; //"CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email : " + email + "\nEncrypted Password : " + pass);
+        console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
         senderpass = crypt.decryptCipherTextWithRandomIV(senderpass, "sanrakshak");
     }
@@ -162,9 +162,7 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            tools.sendVerificationMail(nodemailer, senderemail, senderpass, email);
-            res.send("1");
-            console.log(">  Account Successfully Created");
+            tools.sendVerificationMail(nodemailer, senderemail, senderpass, email, res, User);
         }
     });
 });
