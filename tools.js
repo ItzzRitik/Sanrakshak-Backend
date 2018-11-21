@@ -31,8 +31,8 @@ module.exports = {
     var data = {
       from: "Sanrakshak <verify@sanrakshak.in>",
       to: email,
-      subject: "Hello",
-      text: "Testing some Mailgun awesomeness!"
+      subject: "Verify Your Email",
+      text: ""
     };
     mailgun.messages().send(data, function(e, body) {
       if (e) {

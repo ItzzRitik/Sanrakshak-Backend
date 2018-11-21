@@ -9,6 +9,7 @@ const clear = require('clear');
 const git = require('simple-git/promise')();
 const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sanrakshak.in" });
 
+const PORT = 8080;
 var call = 0;
 var con = null;
 
@@ -39,6 +40,7 @@ var User = mongoose.model("users", UserSchema);
 
 //Routes
 app.post("/connect", function(req, res) {
+    console.log(req.protocol + '://' + req.get('host'));
     if (mongoose.connection.readyState == 2) {
         console.log(">  Connection Request Recieved");
     }
@@ -160,6 +162,7 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
+            var server = req.protocol + '://' + req.get('host') + req.originalUrl + ":" + PORT;
             tools.sendVerificationMail(mailgun, email, res, user);
         }
     });
@@ -263,7 +266,7 @@ app.get("*", function(req, res) {
     res.send("Working!!!");
 });
 
-app.listen(8080, function() {
+app.listen(PORT, function() {
     clear();
     console.log("\n" + ++call + ") Starting Server");
     console.log(">  Server is Listening");
