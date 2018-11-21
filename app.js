@@ -131,17 +131,15 @@ app.post("/login", function(req, res) {
 });
 
 app.post("/signup", function(req, res) {
-    var encryptedemail = email;
     var email = req.body.email;
+    var encryptedemail = email;
     var pass = req.body.pass;
-    var senderemail = "itzzritikhax@gmail.com";
-    var senderpass = "CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
+        console.log("Email : " + email);
+        console.log("Encrypted Email : " + encryptedemail + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
-        senderpass = crypt.decryptCipherTextWithRandomIV(senderpass, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -162,8 +160,8 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            var body = req.protocol + '://' + req.get('host') + "/verify?email=" + encryptedemail;
-            tools.sendVerificationMail(mailgun, email, body, res, user);
+            var message = req.protocol + '://' + req.get('host') + "/verify?email=" + encryptedemail;
+            tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
 });

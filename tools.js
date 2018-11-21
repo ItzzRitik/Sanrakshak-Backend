@@ -27,12 +27,12 @@ module.exports = {
       }
     });
   },
-  sendVerificationMail: function(mailgun, email, body, res, user) {
+  sendVerificationMail: function(mailgun, email, message, res, user) {
     var data = {
       from: "Sanrakshak <verify@sanrakshak.in>",
       to: email,
       subject: "Verify Your Email",
-      text: body
+      text: message
     };
     mailgun.messages().send(data, function(e, body) {
       if (e) {
@@ -45,6 +45,7 @@ module.exports = {
       else {
         res.send("1");
         console.log(">  Verification Email Sent");
+        console.log(body);
       }
     });
   }
