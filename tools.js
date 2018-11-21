@@ -27,8 +27,15 @@ module.exports = {
       }
     });
   },
-  sendMail: function() {
-    var api_key = "key-00515078af3ab1f28f2ecc9ba40ea4a3";
-    var domain = "www.sanrakshak.in";
+  sendMail: function(mailgun, email) {
+    var data = {
+      from: "Sanrakshak <verify@sanrakshak.in>",
+      to: email,
+      subject: "Hello",
+      text: "Testing some Mailgun awesomeness!"
+    };
+    mailgun.messages().send(data, function(e, body) {
+      console.log(body);
+    });
   }
 };

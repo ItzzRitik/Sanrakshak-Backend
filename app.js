@@ -7,6 +7,7 @@ const crypt = require('./CryptLib');
 const tools = require('./tools');
 const clear = require('clear');
 const git = require('simple-git/promise')();
+const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "www.sanrakshak.in" });
 
 var call = 0;
 var con = null;
@@ -14,12 +15,8 @@ var con = null;
 const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
 mongoose.connect(dbURI, dbOptions).then(
-    () => {
-        console.log(">  Connection Established");
-    },
-    e => {
-        console.log(">  Connection Failed \n>  " + e);
-    }
+    () => { console.log(">  Connection Established"); },
+    e => { console.log(">  Connection Failed \n>  " + e); }
 );
 
 app.use(BodyParser.urlencoded({ extended: true }));
@@ -163,7 +160,8 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            tools.sendVerificationMail(nodemailer, senderemail, senderpass, email, res, User);
+            //tools.sendVerificationMail(nodemailer, senderemail, senderpass, email, res, User);
+            tools.sendMail(mailgun, email);
         }
     });
 });
