@@ -7,7 +7,7 @@ const crypt = require('./CryptLib');
 const tools = require('./tools');
 const clear = require('clear');
 const git = require('simple-git/promise')();
-const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sanrakshak.in" });
+const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sandboxdd85c086c6944f2a9cacbd41caea469e.mailgun.org" });
 
 const PORT = 8080;
 var call = 0;
@@ -160,7 +160,7 @@ app.post("/signup", function(req, res) {
         }
         else {
             console.log("Token : " + token);
-            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + token;
+            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
             tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
