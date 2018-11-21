@@ -160,15 +160,16 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            var message = req.protocol + '://' + req.get('host') + "/verify?email=" + encryptedemail;
+            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encryptedemail;
             tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
 });
 
 app.get("/verify", function(req, res) {
-    var email = req.query.email;
+    var email = req.query.token;
     console.log("\n" + ++call + ") Verification Initiated");
+    console.log(">  Token Received : " + email);
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log(">  Email : " + email);
