@@ -2,19 +2,15 @@ const express = require("express");
 const app = express();
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
-const nodemailer = require('nodemailer');
-const crypt = require('./CryptLib');
-const tools = require('./tools');
 const clear = require('clear');
 const git = require('simple-git/promise')();
-const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sandboxdd85c086c6944f2a9cacbd41caea469e.mailgun.org" });
-
 const aws = require("aws-sdk");
-aws.config.update({
-    accessKeyId: "AKIAI72EENGUASFHPFZA",
-    secretAccessKey: "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",
-    region: "us-east-1"
-});
+const crypt = require('./CryptLib');
+const tools = require('./tools');
+const sesconfig = require('./ses');
+
+aws.config.update(sesconfig);
+
 const ses = new aws.SES({ apiVersion: "2010-12-01" });
 
 var call = 0;
@@ -89,12 +85,12 @@ app.post("/check", function(req, res) {
         else {
             if (user.length) {
                 res.send("1");
-                console.log(">  \"" + email + "\" exists in database");
+                console.log("\"" + email + "\" exists in database");
                 console.log(">  Login Initiated");
             }
             else {
                 res.send("0");
-                console.log(">  \"" + email + "\" doesn't exists in database");
+                console.log("\"" + email + "\" doesn't exists in database");
                 console.log(">  Account creation Initiated");
             }
         }
@@ -166,9 +162,9 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            console.log("Token : " + token);
+            console.log("Token : " + token.replace(/\r?\n|\r/g, ""));
             var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
-            //tools.sendVerificationMail(mailgun, email, message, res, user);
+            tools.sendVerificationMail(ses, email, message, res, user);
         }
     });
 });
@@ -176,7 +172,7 @@ app.post("/signup", function(req, res) {
 app.get("/verify", function(req, res) {
     var email = req.query.token;
     console.log("\n" + ++call + ") Verification Initiated");
-    console.log(">  Token Received : " + email);
+    console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log(">  Email : " + email);
@@ -198,7 +194,7 @@ app.get("/verify", function(req, res) {
             res.send("0");
         }
         else {
-            console.log(">  Account \"" + email + "\" Has Been Verified");
+            console.log(">  Account Has Been Verified");
             res.send("1");
         }
     });
@@ -273,7 +269,6 @@ app.get("*", function(req, res) {
 });
 
 app.listen(8080, function() {
-    tools.sendVerificationMail(ses, "ritik.space@gmail.com");
     clear();
     console.log("\n" + ++call + ") Starting Server");
     console.log(">  Server is Listening");
