@@ -15,6 +15,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
+    "mailgun-js": "^0.22.0",
     "mongoose": "^5.3.12",
     "multer": "^1.4.1",
     "nodemailer": "^4.7.0",
