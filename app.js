@@ -7,10 +7,8 @@ const git = require('simple-git/promise')();
 const aws = require("aws-sdk");
 const crypt = require('./CryptLib');
 const tools = require('./tools');
-const sesconfig = require('./ses');
 
-aws.config.update(sesconfig);
-
+aws.config.update(require('./ses'));
 const ses = new aws.SES({ apiVersion: "2010-12-01" });
 
 var call = 0;
