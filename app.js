@@ -7,7 +7,7 @@ const crypt = require('./CryptLib');
 const tools = require('./tools');
 const clear = require('clear');
 const git = require('simple-git/promise')();
-const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "www.sanrakshak.in" });
+const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sanrakshak.in" });
 
 var call = 0;
 var con = null;
@@ -161,7 +161,7 @@ app.post("/signup", function(req, res) {
         }
         else {
             //tools.sendVerificationMail(nodemailer, senderemail, senderpass, email, res, User);
-            tools.sendMail(mailgun, email);
+            tools.sendMail(mailgun, email, res);
         }
     });
 });

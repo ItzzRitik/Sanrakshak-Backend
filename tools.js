@@ -34,8 +34,14 @@ module.exports = {
       subject: "Hello",
       text: "Testing some Mailgun awesomeness!"
     };
-    mailgun.messages().send(data, function(e, body) {
-      console.log(body);
+    mailgun.messages().send(data, function(e, body, res) {
+      if (e) {
+        res.send("0");
+        console.log(e);
+      }
+      else {
+        res.send("1");
+      }
     });
   }
 };
