@@ -26,5 +26,9 @@ module.exports = {
         console.log(">  Verification Email Sent");
       }
     });
+  },
+  sendMail: function() {
+    var api_key = "key-00515078af3ab1f28f2ecc9ba40ea4a3";
+    var domain = "www.sanrakshak.in";
   }
 };
