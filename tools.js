@@ -16,9 +16,9 @@ module.exports = {
     transporter.sendMail(mailOptions, function(e, info) {
       if (e) {
         res.send("0");
-        console.log(">  Couldn't Send Verification Email\n   >  " + e);
-        user.remove({ email: email }, function(err, obj) {
-          if (err) throw err;
+        console.log(">  Couldn't Send Verification Email\n   >  " + e.name);
+        user.deleteMany({ email: email }, function(e, obj) {
+          if (e) throw e;
         });
       }
       else {
