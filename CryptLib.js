@@ -1,4 +1,3 @@
-
 /*global console*/
 'use strict';
 
@@ -7,13 +6,13 @@ const BufferList = require('bl');
 
 /**
  * CrossPlatform CryptLib
-   * This cross platform CryptLib uses AES 256 for encryption. This library can
-   * be used for encryptoion and de-cryption of string on iOS, Android, Windows
-   * and Node platform.
-   * Features:
-   * 1. 256 bit AES encryption
-   * 2. Random IV generation.
-   * 3. Provision for SHA256 hashing of key.
+ * This cross platform CryptLib uses AES 256 for encryption. This library can
+ * be used for encryptoion and de-cryption of string on iOS, Android, Windows
+ * and Node platform.
+ * Features:
+ * 1. 256 bit AES encryption
+ * 2. Random IV generation.
+ * 3. Provision for SHA256 hashing of key.
  */
 class CryptLib {
 
@@ -48,18 +47,18 @@ class CryptLib {
   _encryptDecrypt(text, key, initVector, isEncrypt) {
 
     if (!text || !key) {
-      throw 'cryptLib._encryptDecrypt: -> key and plain or encrypted text '+
-       'required';
+      throw 'cryptLib._encryptDecrypt: -> key and plain or encrypted text ' +
+        'required';
     }
 
     let ivBl = new BufferList(),
-        keyBl = new BufferList(),
-        keyCharArray = key.split(''),
-        ivCharArray = [],
-        encryptor, decryptor, clearText;
+      keyBl = new BufferList(),
+      keyCharArray = key.split(''),
+      ivCharArray = [],
+      encryptor, decryptor, clearText;
 
     if (initVector && initVector.length > 0) {
-       ivCharArray = initVector.split('');
+      ivCharArray = initVector.split('');
     }
 
     for (let i = 0; i < this._maxIVSize; i++) {
@@ -91,7 +90,7 @@ class CryptLib {
    * checks if length is preset and is a whole number and > 0
    * @param  {int}  length
    * @return {bool}
-  */
+   */
   _isCorrectLength(length) {
     return length && /^\d+$/.test(length) && parseInt(length, 10) !== 0
   }
@@ -106,7 +105,7 @@ class CryptLib {
     }
 
     let randomBytes = crypto.randomBytes(length),
-        _iv = [];
+      _iv = [];
 
     for (let i = 0; i < length; i++) {
       let ptr = randomBytes[i] %
@@ -144,9 +143,9 @@ class CryptLib {
     }
 
     return crypto.createHash(this._hashAlgo)
-                 .update(key)
-                 .digest(this._digestEncoding)
-                 .substring(0, length);
+      .update(key)
+      .digest(this._digestEncoding)
+      .substring(0, length);
   }
 
   /**

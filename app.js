@@ -4,6 +4,7 @@ const BodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
 const crypt = require('./CryptLib');
+const tools = require('./tools');
 const clear = require('clear');
 const git = require('simple-git/promise')();
 
@@ -161,25 +162,7 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            var transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: senderemail,
-                    pass: senderpass
-                }
-            });
-            const mailOptions = {
-                from: senderemail,
-                to: email,
-                subject: "Email Verification",
-                html: "<p>Your html here</p>"
-            };
-            transporter.sendMail(mailOptions, function(err, info) {
-                if (err)
-                    console.log(err)
-                else
-                    console.log(info);
-            });
+            tools.sendVerificationMail(nodemailer, senderemail, senderpass, email);
             res.send("1");
             console.log(">  Account Successfully Created");
         }
