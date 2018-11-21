@@ -135,7 +135,7 @@ app.post("/signup", function(req, res) {
     var email = req.body.email;
     var pass = req.body.pass;
     var senderemail = "itzzritikhax@gmail.com";
-    var senderpass = "OhaCqH7ZyL7mA115EoxXa7M3SAoHEx3aep5Mz06uGKk="; //"CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
+    var senderpass = "CgZobzQzu8dl3bQ2Rcg2RsTFB6weSmHgrovCW3LZiX4=";
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -167,15 +167,72 @@ app.post("/signup", function(req, res) {
     });
 });
 
+app.get("/verify", function(req, res) {
+    var email = req.query.email;
+    console.log("\n" + ++call + ") Verification Initiated");
+    try {
+        //email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        console.log(">  Email : " + email);
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    User.update({
+        email: email
+    }, {
+        $set: {
+            verified: "1"
+        }
+    }, function(err, user) {
+        if (err) {
+            console.log("Something Went Wrong");
+            res.send("0");
+        }
+        else {
+            console.log("We saved a User");
+            console.log(user);
+            res.send("1");
+        }
+    });
+});
+app.get("/checkverification", function(req, res) {
+    var email = req.body.email;
+    try {
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+    }
+    catch (e) {
+        res.send("0");
+        return;
+    }
+    User.find({ email: email }, function(e, user) {
+        if (e) {}
+        else if (user.length) {
+            if (user[0].verified == "1") {
+                res.send("1");
+                console.log(user[0].verified);
+            }
+            else {
+                res.send("0");
+            }
+        }
+        else {
+            res.send("0");
+        }
+    });
+});
+
 app.get("/dropusers", function(req, res) {
+    console.log("\n" + ++call + ") Deleting Collection \"Users\"");
     mongoose.connection.dropCollection("users", function(err, result) {
         if (err) {
             res.send("0");
-            console.log("Error delete collection");
+            console.log(">  Failed");
         }
         else {
             res.send("1");
-            console.log("Delete collection success");
+            console.log(">  Success");
         }
     });
 });
