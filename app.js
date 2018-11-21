@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const BodyParser = require("body-parser");
+const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
 const crypt = require('./CryptLib');
@@ -9,7 +9,14 @@ const clear = require('clear');
 const git = require('simple-git/promise')();
 const mailgun = require('mailgun-js')({ apiKey: "key-00515078af3ab1f28f2ecc9ba40ea4a3", domain: "sandboxdd85c086c6944f2a9cacbd41caea469e.mailgun.org" });
 
-const PORT = 8080;
+const aws = require("aws-sdk");
+aws.config.update({
+    accessKeyId: "AKIAI72EENGUASFHPFZA",
+    secretAccessKey: "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",
+    region: "us-east-1"
+});
+const ses = new aws.SES({ apiVersion: "2010-12-01" });
+
 var call = 0;
 var con = null;
 
@@ -20,7 +27,7 @@ mongoose.connect(dbURI, dbOptions).then(
     e => { console.log(">  Connection Failed \n>  " + e); }
 );
 
-app.use(BodyParser.urlencoded({ extended: true }));
+app.use(bodyparser.urlencoded({ extended: true }));
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -161,7 +168,7 @@ app.post("/signup", function(req, res) {
         else {
             console.log("Token : " + token);
             var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
-            tools.sendVerificationMail(mailgun, email, message, res, user);
+            //tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
 });
@@ -265,7 +272,8 @@ app.get("*", function(req, res) {
     res.send("Working!!!");
 });
 
-app.listen(PORT, function() {
+app.listen(8080, function() {
+    tools.sendVerificationMail(ses, "ritik.space@gmail.com");
     clear();
     console.log("\n" + ++call + ") Starting Server");
     console.log(">  Server is Listening");
