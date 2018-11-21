@@ -113,6 +113,7 @@ app.post("/login", function(req, res) {
     User.find({ email: email }, function(e, user) {
         if (e) {
             console.log(">  Error occured while logging in :\n>  " + e);
+            res.send("0");
         }
         else if (user.length) {
             if (user[0].pass == pass) {
@@ -171,7 +172,7 @@ app.get("/verify", function(req, res) {
     var email = req.query.email;
     console.log("\n" + ++call + ") Verification Initiated");
     try {
-        //email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log(">  Email : " + email);
     }
     catch (e) {
@@ -179,7 +180,7 @@ app.get("/verify", function(req, res) {
         res.send("0");
         return;
     }
-    User.update({
+    User.updateMany({
         email: email
     }, {
         $set: {
@@ -187,17 +188,16 @@ app.get("/verify", function(req, res) {
         }
     }, function(err, user) {
         if (err) {
-            console.log("Something Went Wrong");
+            console.log(">  Verification Failed");
             res.send("0");
         }
         else {
-            console.log("We saved a User");
-            console.log(user);
+            console.log(">  Account \"" + email + "\" Has Been Verified");
             res.send("1");
         }
     });
 });
-app.get("/checkverification", function(req, res) {
+app.post("/checkverification", function(req, res) {
     var email = req.body.email;
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -207,11 +207,10 @@ app.get("/checkverification", function(req, res) {
         return;
     }
     User.find({ email: email }, function(e, user) {
-        if (e) {}
+        if (e) { res.send("0"); }
         else if (user.length) {
             if (user[0].verified == "1") {
                 res.send("1");
-                console.log(user[0].verified);
             }
             else {
                 res.send("0");
