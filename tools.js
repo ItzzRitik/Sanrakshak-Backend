@@ -1,5 +1,5 @@
 module.exports = {
-  sendVerificationMail: function(nodemailer, senderemail, senderpass, email, res, user) {
+  sendMail: function(nodemailer, senderemail, senderpass, email, res, user) {
     var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -27,7 +27,7 @@ module.exports = {
       }
     });
   },
-  sendMail: function(mailgun, email, res) {
+  sendVerificationMail: function(mailgun, email, res, user) {
     var data = {
       from: "Sanrakshak <verify@sanrakshak.in>",
       to: email,
@@ -37,11 +37,14 @@ module.exports = {
     mailgun.messages().send(data, function(e, body) {
       if (e) {
         res.send("0");
-        console.log(e);
+        console.log(">  Couldn't Send Verification Email\n   >  " + e.message.substring(0, 13));
+        user.deleteMany({ email: email }, function(e, obj) {
+          if (e) throw e;
+        });
       }
       else {
-        console.log(body);
-        res.send("0");
+        res.send("1");
+        console.log(">  Verification Email Sent");
       }
     });
   }

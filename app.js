@@ -160,8 +160,7 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            //tools.sendVerificationMail(nodemailer, senderemail, senderpass, email, res, User);
-            tools.sendMail(mailgun, email, res);
+            tools.sendVerificationMail(mailgun, email, res, user);
         }
     });
 });
