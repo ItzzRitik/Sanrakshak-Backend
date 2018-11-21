@@ -161,7 +161,7 @@ app.post("/signup", function(req, res) {
         }
         else {
             var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encryptedemail;
-            tools.sendVerificationMail(mailgun, email, message, res, user);
+            tools.sendVerificationMail(mailgun, email, encodeURIComponent(message), res, user);
         }
     });
 });
