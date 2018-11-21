@@ -40,7 +40,6 @@ var User = mongoose.model("users", UserSchema);
 
 //Routes
 app.post("/connect", function(req, res) {
-    console.log(req.protocol + '://' + req.get('host'));
     if (mongoose.connection.readyState == 2) {
         console.log(">  Connection Request Recieved");
     }
@@ -132,6 +131,7 @@ app.post("/login", function(req, res) {
 });
 
 app.post("/signup", function(req, res) {
+    var encryptedemail = email;
     var email = req.body.email;
     var pass = req.body.pass;
     var senderemail = "itzzritikhax@gmail.com";
@@ -162,8 +162,8 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            var server = req.protocol + '://' + req.get('host') + req.originalUrl + ":" + PORT;
-            tools.sendVerificationMail(mailgun, email, res, user);
+            var body = req.protocol + '://' + req.get('host') + "/verify?email=" + encryptedemail;
+            tools.sendVerificationMail(mailgun, email, body, res, user);
         }
     });
 });
