@@ -132,13 +132,12 @@ app.post("/login", function(req, res) {
 
 app.post("/signup", function(req, res) {
     var email = req.body.email;
-    var encryptedemail = email;
+    var token = email;
     var pass = req.body.pass;
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email : " + email);
-        console.log("Encrypted Email : " + encryptedemail + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
+        console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
         pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
     }
     catch (e) {
@@ -160,8 +159,9 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encryptedemail;
-            tools.sendVerificationMail(mailgun, email, encodeURIComponent(message), res, user);
+            console.log("Token : " + token);
+            var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
+            tools.sendVerificationMail(mailgun, email, message, res, user);
         }
     });
 });

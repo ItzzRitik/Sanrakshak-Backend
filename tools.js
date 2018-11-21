@@ -45,7 +45,7 @@ module.exports = {
       else {
         res.send("1");
         console.log(">  Verification Email Sent");
-        console.log(body);
+        //console.log(body);
       }
     });
   }
