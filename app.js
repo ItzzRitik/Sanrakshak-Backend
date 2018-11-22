@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const clear = require('clear');
 const git = require('simple-git/promise')();
 const aws = require("aws-sdk");
-const crypt = require('./CryptLib');
 const tools = require('./tools');
 
 aws.config.update(require('./ses'));
@@ -48,7 +47,7 @@ app.post("/connect", function(req, res) {
         if (mongoose.connection.readyState == 1) {
             var device = req.body.device;
             try {
-                device = crypt.decryptCipherTextWithRandomIV(device, "sanrakshak");
+                device = tools.decryptCipherTextWithRandomIV(device, "sanrakshak");
             }
             catch (e) {
                 console.log(">  Error occured while decrypting device name :\n>  " + e);
@@ -71,7 +70,7 @@ app.post("/check", function(req, res) {
     var email = req.body.email;
     console.log("\n" + ++call + ") Searching For Account");
     try {
-        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -100,9 +99,9 @@ app.post("/login", function(req, res) {
     var pass = req.body.pass;
     console.log("\n" + ++call + ") Authentication Started");
     try {
-        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
-        pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+        pass = tools.decryptCipherTextWithRandomIV(pass, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -137,9 +136,9 @@ app.post("/signup", function(req, res) {
     var pass = req.body.pass;
     console.log("\n" + ++call + ") Account Creation Started");
     try {
-        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
         console.log("Email : " + email + "\nEncrypted Password : " + pass.replace(/\r?\n|\r/g, ""));
-        pass = crypt.decryptCipherTextWithRandomIV(pass, "sanrakshak");
+        pass = tools.decryptCipherTextWithRandomIV(pass, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -173,8 +172,8 @@ app.get("/verify", function(req, res) {
     console.log("\n" + ++call + ") Verification Initiated");
     console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
     try {
-        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email Linked with Token: " + email);
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        console.log("Email Linked : " + email);
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -201,7 +200,7 @@ app.get("/verify", function(req, res) {
 app.post("/checkverification", function(req, res) {
     var email = req.body.email;
     try {
-        email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
     }
     catch (e) {
         res.send("0");
