@@ -1,5 +1,4 @@
-const express = require("express");
-const app = express();
+const app = require("express")();
 const bodyparser = require("body-parser");
 const mongoose = require("mongoose");
 const clear = require('clear');
@@ -35,6 +34,7 @@ var UserSchema = new mongoose.Schema({
     lname: String,
     gender: String,
     dob: String,
+    aadhaar: String,
     verified: String
 });
 var User = mongoose.model("users", UserSchema);
@@ -153,6 +153,7 @@ app.post("/signup", function(req, res) {
         lname: "",
         gender: "",
         dob: "",
+        aadhaar: "",
         verified: "0"
     }, function(e, user) {
         if (e) {
@@ -160,7 +161,7 @@ app.post("/signup", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            console.log("Token : " + token.replace(/\r?\n|\r/g, ""));
+            console.log("Token Generated: " + token.replace(/\r?\n|\r/g, ""));
             var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
             tools.sendVerificationMail(ses, email, message, res, user);
         }
@@ -173,7 +174,7 @@ app.get("/verify", function(req, res) {
     console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
     try {
         email = crypt.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log(">  Email : " + email);
+        console.log("Email Linked with Token: " + email);
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
