@@ -3,7 +3,7 @@
 
 const crypto = require('crypto');
 const BufferList = require('bl');
-class CryptLib {
+class Tools {
   constructor() {
     this._maxKeySize = 32;
     this._maxIVSize = 16;
@@ -23,7 +23,7 @@ class CryptLib {
   _encryptDecrypt(text, key, initVector, isEncrypt) {
 
     if (!text || !key) {
-      throw 'cryptLib._encryptDecrypt: -> key and plain or encrypted text ' +
+      throw '_encryptDecrypt: -> key and plain or encrypted text ' +
         'required';
     }
     let ivBl = new BufferList(),
@@ -59,7 +59,7 @@ class CryptLib {
   }
   generateRandomIV(length) {
     if (!this._isCorrectLength(length)) {
-      throw 'cryptLib.generateRandomIV() -> needs length or in wrong format';
+      throw 'generateRandomIV() -> needs length or in wrong format';
     }
 
     let randomBytes = crypto.randomBytes(length),
@@ -85,11 +85,11 @@ class CryptLib {
   }
   getHashSha256(key, length) {
     if (!key) {
-      throw 'cryptLib.getHashSha256() -> needs key';
+      throw 'getHashSha256() -> needs key';
     }
 
     if (!this._isCorrectLength(length)) {
-      throw 'cryptLib.getHashSha256() -> needs length or in wrong format';
+      throw 'getHashSha256() -> needs length or in wrong format';
     }
 
     return crypto.createHash(this._hashAlgo)
@@ -138,4 +138,4 @@ class CryptLib {
   }
 }
 
-module.exports = new CryptLib();
+module.exports = new Tools();
