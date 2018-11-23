@@ -113,17 +113,23 @@ app.post("/login", function(req, res) {
             console.log(">  Error occured while logging in :\n>  " + e);
             res.send("0");
         }
-        else if (user.length) {
+        else if (user.length > 0) {
             if (user[0].pass == pass) {
-                res.send("1");
-                console.log(">  Authentication successfull");
+                if (user[0].verified == "1") {
+                    res.send("1");
+                    console.log(">  Authentication Successfull");
+                }
+                else {
+                    res.send("2");
+                    console.log(">  Authentication Pending - Launching Email Verification");
+                }
             }
             else {
                 res.send("0");
                 console.log(">  Authentication Terminated: Invalid Password");
             }
         }
-        else {
+        else if (user.length <= 0) {
             res.send("0");
             console.log(">  Authentication Terminated: User doesn't exist");
         }
