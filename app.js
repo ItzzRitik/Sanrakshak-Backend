@@ -170,7 +170,7 @@ app.post("/signup", function(req, res) {
         gender: "",
         dob: "",
         aadhaar: "",
-        verified: "-1"
+        verified: "0"
     }, function(e, user) {
         if (e) {
             res.send("0");
@@ -188,7 +188,8 @@ app.get("/verify", function(req, res) {
     var landing = req.query.landing;
     var email = req.query.token;
     if (landing == "yes") {
-        res.render("verify", { user: "" });
+        var token = req.protocol + '://' + req.get('host') + "/verify?landing=no&token=" + encodeURIComponent(token);
+        res.render("verify", { token: token });
     }
     else if (landing == "no") {
         console.log("\n" + ++call + ") Verification Initiated");
@@ -205,37 +206,18 @@ app.get("/verify", function(req, res) {
         User.find({ email: email }, function(e, user) {
             if (e) { res.send("0"); }
             else if (user.length) {
-                if (user[0].verified == "-1") {
-                    res.send("1");
-                    User.updateMany({ email: email }, { $set: { verified: "0" } },
-                        function(err, user) {
-                            if (err) {
-                                console.log(">  Verification Failed");
-                                res.send("0");
-                            }
-                            else {
-                                console.log(">  Account Has Been Verified");
-                                res.send("1");
-                            }
-                        });
-                }
-                else if (user[0].verified == "0") {
-                    res.send("1");
-                    User.updateMany({ email: email }, { $set: { verified: "1" } },
-                        function(err, user) {
-                            if (err) {
-                                console.log(">  Verification Failed");
-                                res.send("0");
-                            }
-                            else {
-                                console.log(">  Account Has Been Verified");
-                                res.send("1");
-                            }
-                        });
-                }
-                else {
-                    res.send("0");
-                }
+                res.send("1");
+                User.updateMany({ email: email }, { $set: { verified: "1" } },
+                    function(err, user) {
+                        if (err) {
+                            console.log(">  Verification Failed");
+                            res.send("0");
+                        }
+                        else {
+                            console.log(">  Account Has Been Verified");
+                            res.send("1");
+                        }
+                    });
             }
             else {
                 res.send("0");
