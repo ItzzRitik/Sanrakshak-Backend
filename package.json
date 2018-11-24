@@ -16,7 +16,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "mongoose": "^5.3.12",
-    "node-bitlyapi": "^0.4.0",
+    "request": "^2.88.0",
     "simple-git": "^1.107.0"
   }
 }
