@@ -10,6 +10,7 @@ const request = require("request");
 var call = 0;
 var con = null;
 
+app.set("view engine", "ejs");
 
 aws.config.update(require("./ses"));
 const ses = new aws.SES({ apiVersion: "2010-12-01" });
