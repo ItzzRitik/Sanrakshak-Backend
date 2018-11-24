@@ -4,13 +4,17 @@ const mongoose = require("mongoose");
 const clear = require('clear');
 const git = require('simple-git/promise')();
 const aws = require("aws-sdk");
-const tools = require('./tools');
-
-aws.config.update(require('./ses'));
-const ses = new aws.SES({ apiVersion: "2010-12-01" });
+const bit = require("node-bitlyapi");
+const bitly = new bit();
+const tools = require("./tools");
 
 var call = 0;
 var con = null;
+
+bitly.setAccessToken(require("./bitly"));
+
+aws.config.update(require("./ses"));
+const ses = new aws.SES({ apiVersion: "2010-12-01" });
 
 const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
@@ -96,6 +100,7 @@ app.post("/check", function(req, res) {
 
 app.post("/login", function(req, res) {
     var email = req.body.email;
+    var token = email;
     var pass = req.body.pass;
     console.log("\n" + ++call + ") Authentication Started");
     try {
@@ -116,22 +121,29 @@ app.post("/login", function(req, res) {
         else if (user.length > 0) {
             if (user[0].pass == pass) {
                 if (user[0].verified == "1") {
-                    res.send("1");
-                    console.log(">  Authentication Successfull");
+                    if (user[0].fname == "" || user[0].lname == "" || user[0].gender == "" || user[0].dob == "" || user[0].aadhaar == "") {
+                        res.send("3");
+                        console.log(">  Authentication Pending : Launching Profile Creation");
+                    }
+                    else {
+                        res.send("1");
+                        console.log(">  Authentication Successfull");
+                    }
                 }
                 else {
-                    res.send("2");
-                    console.log(">  Authentication Pending - Launching Email Verification");
+                    var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
+                    tools.sendVerificationMail(ses, bitly, email, message, res, user, "2");
+                    console.log(">  Authentication Pending : Launching Email Verification");
                 }
             }
             else {
                 res.send("0");
-                console.log(">  Authentication Terminated: Invalid Password");
+                console.log(">  Authentication Terminated : Invalid Password");
             }
         }
         else if (user.length <= 0) {
             res.send("0");
-            console.log(">  Authentication Terminated: User doesn't exist");
+            console.log(">  Authentication Terminated : User doesn't exist");
         }
     });
 });
@@ -159,7 +171,7 @@ app.post("/signup", function(req, res) {
         gender: "",
         dob: "",
         aadhaar: "",
-        verified: "0"
+        verified: "-1"
     }, function(e, user) {
         if (e) {
             res.send("0");
@@ -168,40 +180,63 @@ app.post("/signup", function(req, res) {
         else {
             console.log("Token Generated: " + token.replace(/\r?\n|\r/g, ""));
             var message = req.protocol + '://' + req.get('host') + "/verify?token=" + encodeURIComponent(token);
-            tools.sendVerificationMail(ses, email, message, res, user);
+            tools.sendVerificationMail(ses, bitly, email, message, res, user, "1");
         }
     });
 });
 
 app.get("/verify", function(req, res) {
-    var email = req.query.token;
-    console.log("\n" + ++call + ") Verification Initiated");
-    console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
-    try {
-        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
-        console.log("Email Linked : " + email);
-    }
-    catch (e) {
-        console.log(">  Error occured while decrypting data :\n>  " + e);
-        res.send("0");
-        return;
-    }
-    User.updateMany({
-        email: email
-    }, {
-        $set: {
-            verified: "1"
-        }
-    }, function(err, user) {
-        if (err) {
-            console.log(">  Verification Failed");
-            res.send("0");
-        }
-        else {
-            console.log(">  Account Has Been Verified");
-            res.send("1");
-        }
-    });
+    // var email = req.query.token;
+    // console.log("\n" + ++call + ") Verification Initiated");
+    // console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
+    // try {
+    //     email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+    //     console.log("Email Linked : " + email);
+    // }
+    // catch (e) {
+    //     console.log(">  Error occured while decrypting data :\n>  " + e);
+    //     res.send("0");
+    //     return;
+    // }
+    // User.find({ email: email }, function(e, user) {
+    //     if (e) { res.send("0"); }
+    //     else if (user.length) {
+    //         if (user[0].verified == "-1") {
+    //             res.send("1");
+    //             User.updateMany({ email: email }, { $set: { verified: "0" } },
+    //                 function(err, user) {
+    //                     if (err) {
+    //                         console.log(">  Verification Failed");
+    //                         res.send("0");
+    //                     }
+    //                     else {
+    //                         console.log(">  Account Has Been Verified");
+    //                         res.send("1");
+    //                     }
+    //                 });
+    //         }
+    //         else if (user[0].verified == "0") {
+    //             res.send("1");
+    //             User.updateMany({ email: email }, { $set: { verified: "1" } },
+    //                 function(err, user) {
+    //                     if (err) {
+    //                         console.log(">  Verification Failed");
+    //                         res.send("0");
+    //                     }
+    //                     else {
+    //                         console.log(">  Account Has Been Verified");
+    //                         res.send("1");
+    //                     }
+    //                 });
+    //         }
+    //         else {
+    //             res.send("0");
+    //         }
+    //     }
+    //     else {
+    //         res.send("0");
+    //     }
+    // });
 });
 app.post("/checkverification", function(req, res) {
     var email = req.body.email;
