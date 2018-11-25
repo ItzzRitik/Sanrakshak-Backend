@@ -186,16 +186,20 @@ app.post("/signup", function(req, res) {
 
 app.get("/verify", function(req, res) {
     var landing = req.query.landing;
-    var email = req.query.token;
+    var token = req.query.token;
+    var email;
     if (landing == "yes") {
-        var token = req.protocol + '://' + req.get('host') + "/verify?landing=no&token=" + encodeURIComponent(token);
-        res.render("verify", { token: token });
+        res.render("verify", {
+            protocol: req.protocol,
+            host: req.get('host'),
+            token: encodeURIComponent(token)
+        });
     }
     else if (landing == "no") {
         console.log("\n" + ++call + ") Verification Initiated");
-        console.log("Token Received : " + email.replace(/\r?\n|\r/g, ""));
+        console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
         try {
-            email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+            email = tools.decryptCipherTextWithRandomIV(token, "sanrakshak");
             console.log("Email Linked : " + email);
         }
         catch (e) {
@@ -206,7 +210,6 @@ app.get("/verify", function(req, res) {
         User.find({ email: email }, function(e, user) {
             if (e) { res.send("0"); }
             else if (user.length) {
-                res.send("1");
                 User.updateMany({ email: email }, { $set: { verified: "1" } },
                     function(err, user) {
                         if (err) {
