@@ -198,49 +198,45 @@ app.get("/verify", function(req, res) {
         return;
     }
     User.find({ email: email }, function(e, user) {
-        if (e) { res.send("0"); }
+        if (e) {}
         else if (user.length > 0) {
-            if (user[0].verified == "1") {
-                verified == "1";
-            }
+            verified = user[0].verified;
         }
-        else {
-            res.send("0");
-        }
-    });
-    if (landing == "yes") {
-        res.render("verify", {
-            protocol: req.protocol,
-            host: req.get('host'),
-            token: encodeURIComponent(token)
-        });
-    }
-    else if (landing == "no") {
-        console.log("\n" + ++call + ") Verification Initiated");
-        console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
-        console.log("Email Linked : " + email);
-        if (verified == "0") {
-            User.find({ email: email }, function(e, user) {
-                if (e) { res.send("0"); }
-                else if (user.length > 0) {
-                    User.updateMany({ email: email }, { $set: { verified: "1" } },
-                        function(err, user) {
-                            if (err) {
-                                console.log(">  Verification Failed");
-                                res.send("0");
-                            }
-                            else {
-                                console.log(">  Account Has Been Verified");
-                                res.send("1");
-                            }
-                        });
-                }
-                else {
-                    res.send("0");
-                }
+        if (landing == "yes") {
+            res.render("verify", {
+                protocol: req.protocol,
+                host: req.get('host'),
+                token: encodeURIComponent(token),
+                verified:verified
             });
         }
-    }
+        else if (landing == "no") {
+            console.log("\n" + ++call + ") Verification Initiated");
+            console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
+            console.log("Email Linked : " + email);
+            if (verified == "0") {
+                User.find({ email: email }, function(e, user) {
+                    if (e) { res.send("0"); }
+                    else if (user.length > 0) {
+                        User.updateMany({ email: email }, { $set: { verified: "1" } },
+                            function(err, user) {
+                                if (err) {
+                                    console.log(">  Verification Failed");
+                                    res.send("0");
+                                }
+                                else {
+                                    console.log(">  Account Has Been Verified");
+                                    res.send("1");
+                                }
+                            });
+                    }
+                    else {
+                        res.send("0");
+                    }
+                });
+            }
+        }
+    });
 });
 
 app.post("/checkverification", function(req, res) {
