@@ -207,10 +207,10 @@ app.get("/verify", function(req, res) {
                 protocol: req.protocol,
                 host: req.get('host'),
                 token: encodeURIComponent(token),
-                verified:verified
+                verified: verified
             });
         }
-        else if (landing == "no") {
+        else if (landing == "no" && verified == "0") {
             console.log("\n" + ++call + ") Verification Initiated");
             console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
             console.log("Email Linked : " + email);
