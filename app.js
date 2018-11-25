@@ -196,13 +196,11 @@ app.get("/verify", function(req, res) {
         });
     }
     else if (landing == "no") {
-        console.log("\n" + ++call + ") Verification Initiated");
-        console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
         try {
             email = tools.decryptCipherTextWithRandomIV(token, "sanrakshak");
-            console.log("Email Linked : " + email);
         }
         catch (e) {
+            console.log("\n" + ++call + ") Verification Initiated");
             console.log(">  Error occured while decrypting data :\n>  " + e);
             res.send("0");
             return;
@@ -210,17 +208,33 @@ app.get("/verify", function(req, res) {
         User.find({ email: email }, function(e, user) {
             if (e) { res.send("0"); }
             else if (user.length) {
-                User.updateMany({ email: email }, { $set: { verified: "1" } },
-                    function(err, user) {
-                        if (err) {
-                            console.log(">  Verification Failed");
-                            res.send("0");
+                if (user[0].verified == "0") {
+                    console.log("\n" + ++call + ") Verification Initiated");
+                    console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
+                    console.log("Email Linked : " + email);
+                    User.find({ email: email }, function(e, user) {
+                        if (e) { res.send("0"); }
+                        else if (user.length) {
+                            User.updateMany({ email: email }, { $set: { verified: "1" } },
+                                function(err, user) {
+                                    if (err) {
+                                        console.log(">  Verification Failed");
+                                        res.send("0");
+                                    }
+                                    else {
+                                        console.log(">  Account Has Been Verified");
+                                        res.send("1");
+                                    }
+                                });
                         }
                         else {
-                            console.log(">  Account Has Been Verified");
-                            res.send("1");
+                            res.send("0");
                         }
                     });
+                }
+                else {
+                    res.send("0");
+                }
             }
             else {
                 res.send("0");
