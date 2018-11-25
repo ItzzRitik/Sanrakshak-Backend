@@ -943,6 +943,7 @@
 	if(<%= verified %>==0){
 		document.querySelector('.container').addEventListener('click',function(){
 			document.querySelector('.container').style.pointerEvents = "none";
+			document.querySelector('.main_pane').style.display = "none";
 			setTimeout(function() {
 		    	var xmlHttp = new XMLHttpRequest();
             	xmlHttp.open( "GET", "<%= protocol %>://<%= host %>/verify?landing=no&token=<%= token %>" , true );
