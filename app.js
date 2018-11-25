@@ -225,6 +225,7 @@ app.get("/verify", function(req, res) {
         });
     }
 });
+
 app.post("/checkverification", function(req, res) {
     var email = req.body.email;
     try {

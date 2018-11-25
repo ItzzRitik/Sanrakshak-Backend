@@ -935,8 +935,9 @@
 		Verify.style.pointerEvents = "none";
 		setTimeout(function() {
 		    var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", <%= token %>  , false );
+            xmlHttp.open( "GET", "<%= token %>"  , false );
             xmlHttp.send( null );
+            console.log("done");
 		}, 3000);
 	});
 </script>
