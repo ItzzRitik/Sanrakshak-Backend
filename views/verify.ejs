@@ -37,7 +37,7 @@
 			float: left;
 			display: inline-block;
 			padding: 16px 30px;
-			background: #41EFB6;
+			background: #55A9F4;
 			color: white;
 			font-weight: 900;
 			text-decoration: none;
@@ -55,8 +55,8 @@
 			border: 2px solid white;
 		}
 		body .container a.follow:hover {
-			color: #41EFB6;
-			border-color: #41EFB6;
+			color: #55A9F4;
+			border-color: #55A9F4;
 		}
 		body .container a {
 			color: #55A9F4;
@@ -867,9 +867,24 @@
 			background-image: -webkit-gradient( linear, left bottom, right bottom, color-stop(0.02, white), color-stop(0.5, gray), color-stop(0.98, white) );
 		}
 		
-		.done{
-			margin auto;
-			border 2px
+		.verifydone{
+			position:absolute;
+			width: 120px;
+			height: 120px;
+			top: 50%;
+			left: 50%;
+			margin-top: -70px;
+			margin-left: -60px;
+			border: 2px dashed #55A9F4;
+			border-radius: 120px;
+			display: flex;
+    		justify-content: center;
+		}
+		.verifydone i{
+			position:absolute;
+			color: #55A9F4;
+			top: 28px;
+			font-size: 50px;
 		}
 	</style>
 </head>
@@ -934,7 +949,7 @@
 		</label>
 	</div>
 	<% } if (verified==1) { %>
-	<div class="done">
+	<div class="verifydone">
 		<i class="icon ion-md-checkmark"></i>
 	</div>
 	<% } %>
