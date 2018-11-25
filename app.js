@@ -187,7 +187,27 @@ app.post("/signup", function(req, res) {
 app.get("/verify", function(req, res) {
     var landing = req.query.landing;
     var token = req.query.token;
-    var email;
+    var email, verified = "0";
+    try {
+        email = tools.decryptCipherTextWithRandomIV(token, "sanrakshak");
+    }
+    catch (e) {
+        console.log("\n" + ++call + ") Verification Initiated");
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    User.find({ email: email }, function(e, user) {
+        if (e) { res.send("0"); }
+        else if (user.length > 0) {
+            if (user[0].verified == "1") {
+                verified == "1";
+            }
+        }
+        else {
+            res.send("0");
+        }
+    });
     if (landing == "yes") {
         res.render("verify", {
             protocol: req.protocol,
@@ -196,50 +216,30 @@ app.get("/verify", function(req, res) {
         });
     }
     else if (landing == "no") {
-        try {
-            email = tools.decryptCipherTextWithRandomIV(token, "sanrakshak");
-        }
-        catch (e) {
-            console.log("\n" + ++call + ") Verification Initiated");
-            console.log(">  Error occured while decrypting data :\n>  " + e);
-            res.send("0");
-            return;
-        }
-        User.find({ email: email }, function(e, user) {
-            if (e) { res.send("0"); }
-            else if (user.length) {
-                if (user[0].verified == "0") {
-                    console.log("\n" + ++call + ") Verification Initiated");
-                    console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
-                    console.log("Email Linked : " + email);
-                    User.find({ email: email }, function(e, user) {
-                        if (e) { res.send("0"); }
-                        else if (user.length) {
-                            User.updateMany({ email: email }, { $set: { verified: "1" } },
-                                function(err, user) {
-                                    if (err) {
-                                        console.log(">  Verification Failed");
-                                        res.send("0");
-                                    }
-                                    else {
-                                        console.log(">  Account Has Been Verified");
-                                        res.send("1");
-                                    }
-                                });
-                        }
-                        else {
-                            res.send("0");
-                        }
-                    });
+        console.log("\n" + ++call + ") Verification Initiated");
+        console.log("Token Received : " + token.replace(/\r?\n|\r/g, ""));
+        console.log("Email Linked : " + email);
+        if (verified == "0") {
+            User.find({ email: email }, function(e, user) {
+                if (e) { res.send("0"); }
+                else if (user.length > 0) {
+                    User.updateMany({ email: email }, { $set: { verified: "1" } },
+                        function(err, user) {
+                            if (err) {
+                                console.log(">  Verification Failed");
+                                res.send("0");
+                            }
+                            else {
+                                console.log(">  Account Has Been Verified");
+                                res.send("1");
+                            }
+                        });
                 }
                 else {
                     res.send("0");
                 }
-            }
-            else {
-                res.send("0");
-            }
-        });
+            });
+        }
     }
 });
 
