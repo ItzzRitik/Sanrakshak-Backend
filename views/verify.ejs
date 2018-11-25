@@ -866,10 +866,15 @@
 			background-image: -ms-linear-gradient(left , white 2%, #E6E6E6 50%, white 98%);
 			background-image: -webkit-gradient( linear, left bottom, right bottom, color-stop(0.02, white), color-stop(0.5, gray), color-stop(0.98, white) );
 		}
+		
+		.done{
+			margin auto;
+			border 2px
+		}
 	</style>
 </head>
 <body>
-	<%if (verified== 0) { %>
+	<%if (verified== 0) {%>
 	<div class="main_pane">
 		<div class="brand_pane">
 			<a class="navbar-brand" href="http://sanrakshak.in/"><img class="logo" src="https://itzzritik.github.io/SanrakshakHome/assets/icon.svg"><p>SANRAKSHAK</p></a>
@@ -880,7 +885,6 @@
 			<p class="details">Thankyou for joining Sanrakhak, Before you can get access on our service.<br> You have to do one simple thing</p>
 		</div>
 	</div>
-	<% } %>
 	<div class='container'>
 		<input id='funky' type='checkbox'>
 		<label for='funky'>
@@ -929,19 +933,23 @@
 			</div>
 		</label>
 	</div>
+	<% } if (verified==1) { %>
+	<div class="done">
+		<i class="icon ion-md-checkmark"></i>
+	</div>
+	<% } %>
 </body>
 <script>
-	var Verify=document.querySelector('.container');
-	Verify.addEventListener('click',function(){
-		if(<%= verified %>==0){
-			document.querySelector('.main_pane').style.display ='none';
-		}
-		Verify.style.pointerEvents = "none";
-		setTimeout(function() {
-		    var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", "<%= protocol %>://<%= host %>/verify?landing=no&token=<%= token %>" , true );
-            console.log("done");
-		}, 3000);
-	});
+	if(<%= verified %>==0){
+		document.querySelector('.container').addEventListener('click',function(){
+			document.querySelector('.container').style.pointerEvents = "none";
+			setTimeout(function() {
+		    	var xmlHttp = new XMLHttpRequest();
+            	xmlHttp.open( "GET", "<%= protocol %>://<%= host %>/verify?landing=no&token=<%= token %>" , true );
+            	xmlHttp.send( null );
+            	console.log("done");
+			}, 3000);
+		});
+	}
 </script>
 </html>
