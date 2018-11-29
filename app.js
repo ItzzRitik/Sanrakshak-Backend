@@ -37,6 +37,7 @@ var UserSchema = new mongoose.Schema({
     gender: String,
     dob: String,
     aadhaar: String,
+    profile: String,
     verified: String
 });
 var User = mongoose.model("users", UserSchema);
@@ -170,6 +171,7 @@ app.post("/signup", function(req, res) {
         gender: "",
         dob: "",
         aadhaar: "",
+        profile: "",
         verified: "0"
     }, function(e, user) {
         if (e) {
@@ -180,6 +182,59 @@ app.post("/signup", function(req, res) {
             console.log("Token Generated: " + token.replace(/\r?\n|\r/g, ""));
             var message = req.protocol + '://' + req.get('host') + "/verify?landing=yes&token=" + encodeURIComponent(token);
             tools.sendVerificationMail(ses, request, email, message, res, user, "1");
+        }
+    });
+});
+app.post("/profile", function(req, res) {
+    var email, fname, lname, gender, dob, aadhaar, profile;
+    console.log("\n" + ++call + ") Profile Creation Started");
+    try {
+        email = tools.decryptCipherTextWithRandomIV(req.body.email, "sanrakshak");
+        fname = tools.decryptCipherTextWithRandomIV(req.body.fname, "sanrakshak");
+        lname = tools.decryptCipherTextWithRandomIV(req.body.lname, "sanrakshak");
+        gender = tools.decryptCipherTextWithRandomIV(req.body.gender, "sanrakshak");
+        dob = tools.decryptCipherTextWithRandomIV(req.body.dob, "sanrakshak");
+        aadhaar = tools.decryptCipherTextWithRandomIV(req.body.aadhaar, "sanrakshak");
+        profile = tools.decryptCipherTextWithRandomIV(req.body.profile, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    User.find({ email: email }, function(e, user) {
+        if (e) { res.send("0"); }
+        else if (user.length > 0) {
+            User.updateMany({ email: email }, {
+                    $set: {
+                        fname: fname,
+                        lname: lname,
+                        gender: gender,
+                        dob: dob,
+                        aadhaar: aadhaar,
+                        profile: profile
+                    }
+                },
+                function(err, user) {
+                    if (err) {
+                        console.log(">  Profile Creation Failed");
+                        res.send("0");
+                    }
+                    else {
+                        console.log(">  Profile Created Successfuly");
+                        console.log("  >  Email : " + email);
+                        console.log("  >  First Name : " + fname);
+                        console.log("  >  Last Name : " + lname);
+                        console.log("  >  Gender : " + gender);
+                        console.log("  >  Date of Birth : " + dob);
+                        console.log("  >  Aadhaar Number : " + aadhaar);
+                        console.log("  >  Profile URL : " + profile);
+                        res.send("1");
+                    }
+                });
+        }
+        else {
+            res.send("0");
         }
     });
 });

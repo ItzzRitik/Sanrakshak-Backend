@@ -5,6 +5,7 @@
 	<title>Sanrakshak - Email Verification</title>
 	<link href="https://raw.githubusercontent.com/ItzzRitik/SanrakshakHome/master/assets/favicon.png" rel="icon" sizes="64x64" type="image/png">
 	<link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+	<%if (verified== 0) {%>
 	<style>
 		@import url(https://fonts.googleapis.com/css?family=Quicksand:500);
 		* {
@@ -866,7 +867,9 @@
 			background-image: -ms-linear-gradient(left , white 2%, #E6E6E6 50%, white 98%);
 			background-image: -webkit-gradient( linear, left bottom, right bottom, color-stop(0.02, white), color-stop(0.5, gray), color-stop(0.98, white) );
 		}
-		
+		</style>
+		<% } if (verified==1) { %>
+		<style>
 		.verifydone{
 			position:absolute;
 			width: 120px;
@@ -880,13 +883,15 @@
 			display: flex;
     		justify-content: center;
 		}
-		.verifydone i{
+		.verifydone ion-icon {
+			font-size: 64px;
 			position:absolute;
 			color: #55A9F4;
-			top: 28px;
+			top: 33px;
 			font-size: 50px;
 		}
-	</style>
+		</style>
+		<% } %>
 </head>
 <body>
 	<%if (verified== 0) {%>
@@ -950,7 +955,7 @@
 	</div>
 	<% } if (verified==1) { %>
 	<div class="verifydone">
-		<i class="icon ion-md-checkmark"></i>
+		<ion-icon name="checkmark"></ion-icon>
 	</div>
 	<% } %>
 </body>
@@ -968,4 +973,5 @@
 		});
 	}
 </script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
 </html>
