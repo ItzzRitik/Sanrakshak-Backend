@@ -347,15 +347,18 @@ app.post("/getprofile", function(req, res) {
 app.get("/addcrack", function(req, res) {
     var x = req.query.x;
     var y = req.query.y;
+    console.log("\n" + ++call + ") Adding a New Crack");
     Crack.create({
         x: x,
         y: y
     }, function(e, user) {
         if (e) {
             res.send("0");
+            console.log(">  Failed");
         }
         else {
             res.send("1");
+            console.log(">  Success");
         }
     });
 });
