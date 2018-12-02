@@ -319,6 +319,29 @@ app.post("/checkverification", function(req, res) {
     });
 });
 
+app.get("/getuser", function(req, res) {
+    var email = req.body.email;
+    console.log("\n" + ++call + ") Profile Details Requested");
+    try {
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    User.find({ email: email }, function(e, user) {
+        if (e) {
+            console.log(">  \"" + email + "\" Doesn't Exist in Database");
+            res.send("0");
+        }
+        else {
+            res.json(user);
+            console.log(">  Profile Details Sent Sucessfully.");
+        }
+    });
+});
+
 app.get("/dropusers", function(req, res) {
     console.log("\n" + ++call + ") Deleting Collection \"Users\"");
     mongoose.connection.dropCollection("users", function(err, result) {
