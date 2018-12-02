@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-var UserSchema = new mongoose.Schema({
+var User = mongoose.model("users", new mongoose.Schema({
     email: String,
     pass: String,
     fname: String,
@@ -38,8 +38,11 @@ var UserSchema = new mongoose.Schema({
     aadhaar: String,
     profile: String,
     verified: String
-});
-var User = mongoose.model("users", UserSchema);
+}));
+var Crack = mongoose.model("cracks", new mongoose.Schema({
+    x: String,
+    y: String
+}));
 
 //Routes
 app.post("/connect", function(req, res) {
@@ -341,18 +344,34 @@ app.post("/getprofile", function(req, res) {
     });
 });
 
-app.get("/dropusers", function(req, res) {
-    console.log("\n" + ++call + ") Deleting Collection \"Users\"");
-    mongoose.connection.dropCollection("users", function(err, result) {
-        if (err) {
+app.get("/addcrack", function(req, res) {
+    var x = req.query.x;
+    var y = req.query.y;
+    Crack.create({
+        x: x,
+        y: y
+    }, function(e, user) {
+        if (e) {
             res.send("0");
-            console.log(">  Failed");
         }
         else {
             res.send("1");
-            console.log(">  Success");
         }
     });
+});
+
+app.get("/dropusers", function(req, res) {
+    // console.log("\n" + ++call + ") Deleting Collection \"Users\"");
+    // mongoose.connection.dropCollection("users", function(err, result) {
+    //     if (err) {
+    //         res.send("0");
+    //         console.log(">  Failed");
+    //     }
+    //     else {
+    //         res.send("1");
+    //         console.log(">  Success");
+    //     }
+    // });
 });
 
 app.get("/git", function(req, res) {
