@@ -15,9 +15,8 @@ app.set("view engine", "ejs");
 aws.config.update(require("./ses"));
 const ses = new aws.SES({ apiVersion: "2010-12-01" });
 
-const dbURI = "mongodb+srv://itzzritik:sanrakshak@sanrakshak-vjchw.mongodb.net/test?retryWrites=true";
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
-mongoose.connect(dbURI, dbOptions).then(
+mongoose.connect(require("./mongo"), dbOptions).then(
     () => { console.log(">  Connection Established"); },
     e => { console.log(">  Connection Failed \n>  " + e); }
 );
@@ -319,7 +318,7 @@ app.post("/checkverification", function(req, res) {
     });
 });
 
-app.get("/getuser", function(req, res) {
+app.post("/getprofile", function(req, res) {
     var email = req.body.email;
     console.log("\n" + ++call + ") Profile Details Requested");
     try {
