@@ -190,22 +190,29 @@ app.post("/signup", function(req, res) {
                 tools.sendVerificationMail(ses, request, email, message, res, user, "1");
             }
             else {
-                console.log("> Account Created Successfuly\n>  Account Verification Not Required");
+                console.log(">  Account Created Successfuly\n>  Account Verification Not Required");
+                res.send("1");
             }
         }
     });
 });
 app.post("/profile", function(req, res) {
-    var email, fname, lname, gender, dob, aadhaar, profile;
+    var email = req.body.email,
+        fname = req.body.fname,
+        lname = req.body.lname,
+        gender = req.body.gender,
+        dob = req.body.dob,
+        aadhaar = req.body.aadhaar,
+        profile = req.body.profile;
     console.log("\n" + ++call + ") Profile Creation Started");
     try {
-        email = tools.decryptCipherTextWithRandomIV(req.body.email, "sanrakshak");
-        fname = tools.decryptCipherTextWithRandomIV(req.body.fname, "sanrakshak");
-        lname = tools.decryptCipherTextWithRandomIV(req.body.lname, "sanrakshak");
-        gender = tools.decryptCipherTextWithRandomIV(req.body.gender, "sanrakshak");
-        dob = tools.decryptCipherTextWithRandomIV(req.body.dob, "sanrakshak");
-        aadhaar = tools.decryptCipherTextWithRandomIV(req.body.aadhaar, "sanrakshak");
-        profile = tools.decryptCipherTextWithRandomIV(req.body.profile, "sanrakshak");
+        (email == null) ? "" : email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        (fname == null) ? "" : fname = tools.decryptCipherTextWithRandomIV(fname, "sanrakshak");
+        (lname == null) ? "" : lname = tools.decryptCipherTextWithRandomIV(lname, "sanrakshak");
+        (gender == null) ? "" : gender = tools.decryptCipherTextWithRandomIV(gender, "sanrakshak");
+        (dob == null) ? "" : dob = tools.decryptCipherTextWithRandomIV(dob, "sanrakshak");
+        (aadhaar == null) ? "" : aadhaar = tools.decryptCipherTextWithRandomIV(aadhaar, "sanrakshak");
+        (profile == null) ? "" : profile = tools.decryptCipherTextWithRandomIV(profile, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
