@@ -41,7 +41,9 @@ var User = mongoose.model("users", new mongoose.Schema({
 }));
 var Crack = mongoose.model("cracks", new mongoose.Schema({
     x: String,
-    y: String
+    y: String,
+    intensity: String,
+    date: String
 }));
 
 //Routes
@@ -154,6 +156,7 @@ app.post("/signup", function(req, res) {
     var email = req.body.email;
     var token = email;
     var pass = req.body.pass;
+    var verified = req.body.verified;
     console.log("\n" + ++call + ") Account Creation Started");
     try {
         email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -174,16 +177,21 @@ app.post("/signup", function(req, res) {
         dob: "",
         aadhaar: "",
         profile: "",
-        verified: "0"
+        verified: verified
     }, function(e, user) {
         if (e) {
             res.send("0");
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
-            console.log("Token Generated: " + token.replace(/\r?\n|\r/g, ""));
-            var message = req.protocol + '://' + req.get('host') + "/verify?landing=yes&token=" + encodeURIComponent(token);
-            tools.sendVerificationMail(ses, request, email, message, res, user, "1");
+            if (verified == 0) {
+                console.log("Token Generated: " + token.replace(/\r?\n|\r/g, ""));
+                var message = req.protocol + '://' + req.get('host') + "/verify?landing=yes&token=" + encodeURIComponent(token);
+                tools.sendVerificationMail(ses, request, email, message, res, user, "1");
+            }
+            else {
+                console.log("> Account Created Successfuly\n>  Account Verification Not Required");
+            }
         }
     });
 });
@@ -350,22 +358,61 @@ app.get("/addcrack", function(req, res) {
     console.log("\n" + ++call + ") Adding a New Crack");
     Crack.create({
         x: x,
-        y: y
-    }, function(e, user) {
+        y: y,
+        intensity: "" + Math.floor((Math.random() * 50) + 10),
+        date: new Date().toLocaleString('en-IN')
+    }, function(e, crack) {
         if (e) {
             res.send("0");
             console.log(">  Failed");
         }
         else {
             res.send("1");
-            console.log(">  Success");
+            console.log(">  Success\n" + crack);
         }
     });
 });
 
+app.post("/getcrack", function(req, res) {
+    var email = req.body.email;
+    console.log("\n" + ++call + ") Cracks Requested");
+    try {
+        email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    Crack.find({}, function(e, cracks) {
+        if (e) {
+            console.log(">  Collection \"cracks\" Doesn't exist");
+            res.send("0");
+        }
+        else {
+            res.json(cracks);
+            console.log(">  Cracks List Sent Sucessfully.");
+        }
+    });
+});
+
+app.get("/encrypt", function(req, res) {
+    var text = req.query.text;
+    try {
+        text = tools.encryptPlainTextWithRandomIV(text, "sanrakshak");
+        text = tools.encryptPlainTextWithRandomIV(text, "sanrakshak");
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    res.send(text);
+});
+
 app.get("/dropusers", function(req, res) {
     // console.log("\n" + ++call + ") Deleting Collection \"Users\"");
-    // mongoose.connection.dropCollection("users", function(err, result) {
+    // mongoose.connection.dropCollection("cracks", function(err, result) {
     //     if (err) {
     //         res.send("0");
     //         console.log(">  Failed");
