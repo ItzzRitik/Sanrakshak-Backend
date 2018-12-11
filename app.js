@@ -179,6 +179,7 @@ app.post("/signup", function(req, res) {
         dob: "",
         aadhaar: "",
         profile: "",
+        cover: "",
         verified: verified
     }, function(e, user) {
         if (e) {
@@ -233,7 +234,8 @@ app.post("/profile", function(req, res) {
                         gender: gender,
                         dob: dob,
                         aadhaar: aadhaar,
-                        profile: profile
+                        profile: profile,
+                        cover: cover
                     }
                 },
                 function(err, user) {
@@ -262,13 +264,13 @@ app.post("/profile", function(req, res) {
 
 app.post("/social", function(req, res) {
     var email = req.body.email,
-        pass = "",
         fname = req.body.fname,
         lname = req.body.lname,
         gender = req.body.gender,
         dob = req.body.dob,
         profile = req.body.profile,
-        cover = req.body.cover;
+        cover = req.body.cover,
+        pass = "";
     console.log("\n" + ++call + ") Profile Creation Started");
     try {
         (email == null) ? "" : email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -308,6 +310,14 @@ app.post("/social", function(req, res) {
             console.log(">  Error While Creating Account\n>  " + e);
         }
         else {
+            console.log(">  Profile Created Successfuly");
+            console.log("  >  Email : " + email);
+            console.log("  >  First Name : " + fname);
+            console.log("  >  Last Name : " + lname);
+            console.log("  >  Gender : " + gender);
+            console.log("  >  Date of Birth : " + dob);
+            console.log("  >  Profile URL : " + profile);
+            console.log("  >  Cover URL : " + cover);
             tools.sendPasswordMail(ses, request, email, pass, res, user, "1");
         }
     });

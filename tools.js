@@ -177,7 +177,7 @@ class Tools {
     sendEmail
       .then(data => {
         res.send(success);
-        console.log(">  Verification Email Sent");
+        console.log(">  Password Email Sent Sucessfully");
       })
       .catch(e => {
         res.send("0");
