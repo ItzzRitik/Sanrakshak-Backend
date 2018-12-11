@@ -6,6 +6,7 @@ const git = require('simple-git/promise')();
 const aws = require("aws-sdk");
 const tools = require("./tools");
 const request = require("request");
+const passgen = require('generate-password');
 
 var call = 0;
 var con = null;
@@ -37,6 +38,7 @@ var User = mongoose.model("users", new mongoose.Schema({
     dob: String,
     aadhaar: String,
     profile: String,
+    cover: String,
     verified: String
 }));
 var Crack = mongoose.model("cracks", new mongoose.Schema({
@@ -203,7 +205,8 @@ app.post("/profile", function(req, res) {
         gender = req.body.gender,
         dob = req.body.dob,
         aadhaar = req.body.aadhaar,
-        profile = req.body.profile;
+        profile = req.body.profile,
+        cover = req.body.cover;
     console.log("\n" + ++call + ") Profile Creation Started");
     try {
         (email == null) ? "" : email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
@@ -213,6 +216,7 @@ app.post("/profile", function(req, res) {
         (dob == null) ? "" : dob = tools.decryptCipherTextWithRandomIV(dob, "sanrakshak");
         (aadhaar == null) ? "" : aadhaar = tools.decryptCipherTextWithRandomIV(aadhaar, "sanrakshak");
         (profile == null) ? "" : profile = tools.decryptCipherTextWithRandomIV(profile, "sanrakshak");
+        (cover == null) ? "" : cover = tools.decryptCipherTextWithRandomIV(cover, "sanrakshak");
     }
     catch (e) {
         console.log(">  Error occured while decrypting data :\n>  " + e);
@@ -252,6 +256,59 @@ app.post("/profile", function(req, res) {
         }
         else {
             res.send("0");
+        }
+    });
+});
+
+app.post("/social", function(req, res) {
+    var email = req.body.email,
+        pass = "",
+        fname = req.body.fname,
+        lname = req.body.lname,
+        gender = req.body.gender,
+        dob = req.body.dob,
+        profile = req.body.profile,
+        cover = req.body.cover;
+    console.log("\n" + ++call + ") Profile Creation Started");
+    try {
+        (email == null) ? "" : email = tools.decryptCipherTextWithRandomIV(email, "sanrakshak");
+        (fname == null) ? "" : fname = tools.decryptCipherTextWithRandomIV(fname, "sanrakshak");
+        (lname == null) ? "" : lname = tools.decryptCipherTextWithRandomIV(lname, "sanrakshak");
+        (gender == null) ? "" : gender = tools.decryptCipherTextWithRandomIV(gender, "sanrakshak");
+        (dob == null) ? "" : dob = tools.decryptCipherTextWithRandomIV(dob, "sanrakshak");
+        (profile == null) ? "" : profile = tools.decryptCipherTextWithRandomIV(profile, "sanrakshak");
+        (cover == null) ? "" : cover = tools.decryptCipherTextWithRandomIV(cover, "sanrakshak");
+
+        pass = passgen.generate({
+            length: 10,
+            numbers: true,
+            uppercase: true,
+            excludeSimilarCharacters: true,
+            strict: true
+        });
+    }
+    catch (e) {
+        console.log(">  Error occured while decrypting data :\n>  " + e);
+        res.send("0");
+        return;
+    }
+    User.create({
+        email: email,
+        pass: pass,
+        fname: fname,
+        lname: lname,
+        gender: gender,
+        dob: dob,
+        profile: profile,
+        cover: cover,
+        verified: "1"
+    }, function(e, user) {
+        if (e) {
+            res.send("0");
+            console.log(">  Error While Creating Account\n>  " + e);
+        }
+        else {
+            tools.sendPasswordMail(ses, request, email, pass, res, user, "1");
         }
     });
 });
@@ -362,12 +419,14 @@ app.post("/getprofile", function(req, res) {
 app.get("/addcrack", function(req, res) {
     var x = req.query.x;
     var y = req.query.y;
+    var intensity = req.query.i;
+    var date = req.query.date;
     console.log("\n" + ++call + ") Adding a New Crack");
     Crack.create({
         x: x,
         y: y,
-        intensity: "" + Math.floor((Math.random() * 50) + 10),
-        date: new Date().toLocaleString('en-IN')
+        intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
+        date: (date != null) ? date : new Date().toLocaleString('en-IN')
     }, function(e, crack) {
         if (e) {
             res.send("0");

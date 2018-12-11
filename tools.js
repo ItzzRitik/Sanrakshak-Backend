@@ -160,6 +160,33 @@ class Tools {
         });
     });
   }
+
+
+  sendPasswordMail(ses, request, email, pass, res, user, success) {
+    const message = "Your System generated password is :\n" + pass;
+    const params = {
+      Destination: { ToAddresses: [email] },
+      ConfigurationSetName: "sanrakshak",
+      Message: {
+        Body: { Html: { Data: message } },
+        Subject: { Data: "Password for Sanrakshak" }
+      },
+      Source: "Sanrakshak <verify@mail.sanrakshak.in>"
+    };
+    const sendEmail = ses.sendEmail(params).promise();
+    sendEmail
+      .then(data => {
+        res.send(success);
+        console.log(">  Verification Email Sent");
+      })
+      .catch(e => {
+        res.send("0");
+        console.log(">  Couldn't Send Password Email\n   >  " + e.message);
+        user.remove({ email: email }, function(e, obj) {
+          if (e) throw e;
+        });
+      });
+  }
 }
 
 module.exports = new Tools();
