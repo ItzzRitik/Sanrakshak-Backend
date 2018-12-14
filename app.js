@@ -426,6 +426,30 @@ app.post("/getprofile", function(req, res) {
     });
 });
 
+app.post("/addcrackpost", function(req, res) {
+    var data = req.body.dataFrame;
+    data = Buffer.from("" + data, 'base64').toString('ascii');
+    data = data.split('-');
+    var intensity = data[data.length - 2];
+    var date = data[data.length - 1];
+    console.log("\n" + ++call + ") Adding a New Crack");
+    Crack.create({
+        x: data[data.length - 4],
+        y: data[data.length - 3],
+        intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
+        date: (date != null) ? date : new Date().toLocaleString('en-IN')
+    }, function(e, crack) {
+        if (e) {
+            res.send("0");
+            console.log(">  Failed");
+        }
+        else {
+            res.send("1");
+            console.log(">  Success\n" + crack);
+        }
+    });
+
+});
 app.get("/addcrack", function(req, res) {
     var x = req.query.x;
     var y = req.query.y;
@@ -487,17 +511,17 @@ app.get("/encrypt", function(req, res) {
 });
 
 app.get("/dropusers", function(req, res) {
-    // console.log("\n" + ++call + ") Deleting Collection \"Users\"");
-    // mongoose.connection.dropCollection("cracks", function(err, result) {
-    //     if (err) {
-    //         res.send("0");
-    //         console.log(">  Failed");
-    //     }
-    //     else {
-    //         res.send("1");
-    //         console.log(">  Success");
-    //     }
-    // });
+    console.log("\n" + ++call + ") Deleting Collection \"Users\"");
+    mongoose.connection.dropCollection("cracks", function(err, result) {
+        if (err) {
+            res.send("0");
+            console.log(">  Failed");
+        }
+        else {
+            res.send("1");
+            console.log(">  Success");
+        }
+    });
 });
 
 app.get("/git", function(req, res) {
