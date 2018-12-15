@@ -443,12 +443,12 @@ app.post("/addcrack", function(req, res) {
     var data = req.body.dataFrame;
     data = Buffer.from("" + data, 'base64').toString('ascii');
     data = data.split('-');
-    var intensity = data[data.length - 2];
-    var date = data[data.length - 1];
+    var intensity = data[3];
+    var date = data[4];
     console.log("\n" + ++call + ") Adding a New Crack");
     Crack.create({
-        x: data[data.length - 4],
-        y: data[data.length - 3],
+        x: data[1],
+        y: data[2],
         intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
         date: (date != null) ? date : new Date().toLocaleString('en-IN')
     }, function(e, crack) {
