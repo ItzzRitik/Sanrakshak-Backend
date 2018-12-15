@@ -50,30 +50,43 @@ var Crack = mongoose.model("cracks", new mongoose.Schema({
 
 //Routes
 app.post("/connect", function(req, res) {
-    if (mongoose.connection.readyState == 2) {
-        console.log(">  Connection Request Recieved");
+    var device = req.body.device;
+    try {
+        device = tools.decryptCipherTextWithRandomIV(device, "sanrakshak");
     }
-    con = setInterval(function sendEmail() {
-        if (mongoose.connection.readyState == 1) {
-            var device = req.body.device;
-            try {
-                device = tools.decryptCipherTextWithRandomIV(device, "sanrakshak");
-            }
-            catch (e) {
-                console.log(">  Error occured while decrypting device name :\n>  " + e);
-                res.send("1");
-                clearInterval(con);
-            }
-            console.log("\n" + ++call + ") Device Connected");
-            console.log(">  " + device);
-            res.send("1");
-            clearInterval(con);
-        }
-        else if (mongoose.connection.readyState == 0) {
-            res.send("0");
-            clearInterval(con);
-        }
-    }, 1000);
+    catch (e) {
+        console.log(">  Error occured while decrypting device name :\n>  " + e);
+        res.send("1");
+        clearInterval(con);
+    }
+    console.log("\n" + ++call + ") Device Connected");
+    console.log(">  " + device);
+    res.send("1");
+
+    // if (mongoose.connection.readyState == 2) {
+    //     console.log(">  Connection Request Recieved");
+    // }
+    // con = setInterval(function sendEmail() {
+    //     if (mongoose.connection.readyState == 1) {
+    // var device = req.body.device;
+    // try {
+    //     device = tools.decryptCipherTextWithRandomIV(device, "sanrakshak");
+    // }
+    // catch (e) {
+    //     console.log(">  Error occured while decrypting device name :\n>  " + e);
+    //     res.send("1");
+    //     clearInterval(con);
+    // }
+    // console.log("\n" + ++call + ") Device Connected");
+    // console.log(">  " + device);
+    // res.send("1");
+    //         clearInterval(con);
+    //     }
+    //     else if (mongoose.connection.readyState == 0) {
+    //         res.send("0");
+    //         clearInterval(con);
+    //     }
+    // }, 1000);
 });
 
 app.post("/check", function(req, res) {
@@ -426,7 +439,7 @@ app.post("/getprofile", function(req, res) {
     });
 });
 
-app.post("/addcrackpost", function(req, res) {
+app.post("/addcrack", function(req, res) {
     var data = req.body.dataFrame;
     data = Buffer.from("" + data, 'base64').toString('ascii');
     data = data.split('-');
@@ -449,28 +462,6 @@ app.post("/addcrackpost", function(req, res) {
         }
     });
 
-});
-app.get("/addcrack", function(req, res) {
-    var x = req.query.x;
-    var y = req.query.y;
-    var intensity = req.query.i;
-    var date = req.query.date;
-    console.log("\n" + ++call + ") Adding a New Crack");
-    Crack.create({
-        x: x,
-        y: y,
-        intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
-        date: (date != null) ? date : new Date().toLocaleString('en-IN')
-    }, function(e, crack) {
-        if (e) {
-            res.send("0");
-            console.log(">  Failed");
-        }
-        else {
-            res.send("1");
-            console.log(">  Success\n" + crack);
-        }
-    });
 });
 
 app.post("/getcrack", function(req, res) {
