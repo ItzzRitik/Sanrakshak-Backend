@@ -463,6 +463,43 @@ app.post("/addcrack", function(req, res) {
     });
 
 });
+app.get("/addcrack", function(req, res) {
+    var x = req.query.x;
+    var y = req.query.y;
+    var intensity = req.query.intensity;
+    var date = req.query.date;
+
+    console.log("\n" + ++call + ") Adding a New Crack");
+    Crack.find({ x: x, y: y }, function(e, crack) {
+        if (e) { console.log(">  Error occured while checking for crack :\n>  " + e); }
+        else {
+            if (crack.length) {
+                res.send("0");
+                console.log("\"" + crack + "\" already exists in database");
+                console.log(">  Can't add duplicate cracks");
+                return;
+            }
+            else {
+                console.log("New Crack Detected");
+                Crack.create({
+                    x: x,
+                    y: y,
+                    intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
+                    date: (date != null) ? date : new Date().toLocaleString('en-IN')
+                }, function(e, crack) {
+                    if (e) {
+                        res.send("0");
+                        console.log(">  Failed");
+                    }
+                    else {
+                        res.send("1");
+                        console.log(">  Crack added sucessfully :\n" + crack);
+                    }
+                });
+            }
+        }
+    });
+});
 
 app.post("/getcrack", function(req, res) {
     var email = req.body.email;
