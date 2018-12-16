@@ -481,7 +481,7 @@ app.get("/addcrack", function(req, res) {
             else {
                 if (crack.length) {
                     res.send("0");
-                    console.log("\"" + crack + "\" already exists in database");
+                    console.log("Requested data already exists in database");
                     console.log(">  Can't add duplicate cracks");
                     return;
                 }
