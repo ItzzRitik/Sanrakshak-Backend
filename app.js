@@ -466,7 +466,7 @@ app.post("/addcrack", function(req, res) {
 app.get("/addcrack", function(req, res) {
     var x = req.query.x;
     var y = req.query.y;
-    var intensity = req.query.intensity;
+    var intensity = req.query.i;
     var date = req.query.date;
     console.log("\n" + ++call + ") Adding a New Crack");
 
@@ -490,7 +490,7 @@ app.get("/addcrack", function(req, res) {
                     Crack.create({
                         x: x,
                         y: y,
-                        intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 10) + 1),
+                        intensity: (intensity != null) ? intensity : Math.floor((Math.random() * 100) + 1),
                         date: (date != null) ? date : new Date().toLocaleString('en-IN')
                     }, function(e, crack) {
                         if (e) {
