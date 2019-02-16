@@ -2,7 +2,7 @@
 
 We at Sanrakshak have pledged to provide utmost safe and secure railway journey to our fellow passengers by attaching our robust and affordable sensors beneath the engine of the train which provides real time data about the occurrence of cracks or any kind of faults on the railway line and ultimately offers a holistic end to end solution to the government.
 
-Sanrakshak consist of three different things
+Sanrakshak can be divided into four different parts
 - A Robot
 - A Mobile Application
 - A Web Application
