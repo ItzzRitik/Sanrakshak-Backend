@@ -1,15 +1,14 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
+# We at Sanrakshak
+
+We at Sanrakshak have pledged to provide utmost safe and secure railway journey to our fellow passengers by attaching our robust and affordable sensors beneath the engine of the train which provides real time data about the occurrence of cracks or any kind of faults on the railway line and ultimately offers a holistic end to end solution to the government.
+
+Sanrakshak can be divided into four different fields
+- A Robot
+- A Mobile Application
+- A Web Application
+- A Web Server
+
+# Sanrakshak Web Server
 
 
-Hi there! Welcome to AWS Cloud9!
-
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
-
-Happy coding!
 
