@@ -524,6 +524,7 @@ app.post("/getcrack", function(req, res) {
             res.send("0");
         }
         else {
+            cracks.reverse();
             res.json(cracks);
             console.log(">  Cracks List Sent Sucessfully.");
         }
