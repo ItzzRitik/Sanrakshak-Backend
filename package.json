@@ -11,7 +11,7 @@
   "dependencies": {
     "aws-sdk": "^2.360.0",
     "bl": "^2.1.2",
-    "body - parser": "^1.18.3",
+    "body-parser": "^1.18.3",
     "clear": "^0.1.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
