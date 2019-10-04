@@ -7,6 +7,7 @@ const aws = require("aws-sdk");
 const tools = require("./tools");
 const request = require("request");
 const passgen = require('generate-password');
+require('dotenv').config();
 
 var call = 0;
 var con = null;
