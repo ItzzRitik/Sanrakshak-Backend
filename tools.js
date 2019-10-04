@@ -124,7 +124,7 @@ class Tools {
       }),
       headers: {
         "Content-Type": "application/json",
-        "apikey": require("./rebrandly")
+        "apikey": process.env.REBRAND
       }
     }, function(e, response, result) {
       if (e) {

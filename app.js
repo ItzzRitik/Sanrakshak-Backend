@@ -13,11 +13,15 @@ var con = null;
 
 app.set("view engine", "ejs");
 
-aws.config.update(require("./ses"));
+aws.config.update({
+    accessKeyId: process.env.accessKeyId,
+    secretAccessKey: process.env.secretAccessKey,
+    region: process.env.region
+});
 const ses = new aws.SES({ apiVersion: "2010-12-01" });
 
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
-mongoose.connect(require("./mongo"), dbOptions).then(
+mongoose.connect(process.env.MONGO_KEY, dbOptions).then(
     () => { console.log(">  Connection Established"); },
     e => { console.log(">  Connection Failed \n>  " + e); }
 );
