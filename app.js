@@ -476,9 +476,9 @@ app.get("/addcrack", function(req, res) {
     console.log("\n" + ++call + ") Adding a New Crack");
 
     if (x == 0 || y == 0) {
-        res.send("0");
         console.log("Empty or Zero(0) Value Received");
         console.log(">  Can't add these values");
+        res.send("0");
     }
     else
         Crack.find({ x: x, y: y }, function(e, crack) {
@@ -499,12 +499,12 @@ app.get("/addcrack", function(req, res) {
                         date: (date != null) ? date : new Date().toLocaleString('en-IN')
                     }, function(e, crack) {
                         if (e) {
-                            res.send("0");
                             console.log(">  Failed");
+                            res.send("0");
                         }
                         else {
-                            res.send("1");
                             console.log(">  Crack added sucessfully :\n" + crack);
+                            res.send("1");
                         }
                     });
                 }
