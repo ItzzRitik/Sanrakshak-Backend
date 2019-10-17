@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "app.js",
 	"scripts": {
-		"start": "node app.js > log.txt"
+		"start": "node app.js 2>&1 | tee log-file.txt"
 	},
 	"author": "Ritik Srivastava",
 	"license": "ISC",
@@ -17,6 +17,7 @@
 		"ejs": "^2.6.1",
 		"express": "^4.16.4",
 		"generate-password": "^1.4.1",
+		"log4js": "^5.2.2",
 		"mongoose": "^5.3.12",
 		"request": "^2.88.0",
 		"simple-git": "^1.107.0"

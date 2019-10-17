@@ -9,6 +9,12 @@ const request = require('request');
 const passgen = require('generate-password');
 require('dotenv').config();
 
+const log4js = require('log4js');
+log4js.configure({
+	appenders: [ { type: 'console' }, { type: 'file', filename: 'logs/cheese.log', category: 'cheese' } ]
+});
+const logger = log4js.getLogger('cheese');
+
 var call = 0;
 var con = null;
 
