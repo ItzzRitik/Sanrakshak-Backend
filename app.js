@@ -565,22 +565,22 @@ app.get('/addcrack', function(req, res) {
 
 app.post('/getcrack', function(req, res) {
 	var email = req.body.email;
-	console.log('\n' + ++call + ') Cracks Requested');
+	logger.info(++call + ') Cracks Requested');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
 	Crack.find({}, function(e, cracks) {
 		if (e) {
-			console.log('>  Collection "cracks" Doesn\'t exist');
+			logger.error('>  Collection "cracks" Doesn\'t exist');
 			res.send('0');
 		} else {
 			cracks.reverse();
 			res.json(cracks);
-			console.log('>  Cracks List Sent Sucessfully.');
+			logger.info('>  Cracks List Sent Sucessfully.');
 		}
 	});
 });
@@ -591,7 +591,7 @@ app.get('/encrypt', function(req, res) {
 		text = tools.encryptPlainTextWithRandomIV(text, 'sanrakshak');
 		text = tools.encryptPlainTextWithRandomIV(text, 'sanrakshak');
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -599,43 +599,43 @@ app.get('/encrypt', function(req, res) {
 });
 
 app.get('/dropusers', function(req, res) {
-	console.log('\n' + ++call + ') Deleting Collection "Users"');
+	logger.info(++call + ') Deleting Collection "Users"');
 	mongoose.connection.dropCollection('cracks', function(err, result) {
 		if (err) {
 			res.send('0');
-			console.log('>  Failed');
+			logger.error('>  Failed');
 		} else {
 			res.send('1');
-			console.log('>  Success');
+			logger.info('>  Success');
 		}
 	});
 });
 
 app.get('/git', function(req, res) {
 	var m = req.query.m;
-	console.log('\n' + ++call + ') Pushing to Github');
+	logger.info(++call + ') Pushing to Github');
 	git.add('.').then(
 		(addSuccess) => {
-			console.log('>  Changes Successfully Added to Stack');
+			logger.info('>  Changes Successfully Added to Stack');
 		},
 		(failedAdd) => {
-			console.log('>  Changes Adding Failed\n>  ' + failedAdd);
+			logger.error('>  Changes Adding Failed\n>  ' + failedAdd);
 		}
 	);
 	git.commit(m).then(
 		(successCommit) => {
-			console.log('>  Changes Successfully Commited\n   >  Message : "' + m + '"');
+			logger.info('>  Changes Successfully Commited\n   >  Message : "' + m + '"');
 		},
 		(failed) => {
-			console.log('>  Changes Commit Failed\n>  ' + failed);
+			logger.error('>  Changes Commit Failed\n>  ' + failed);
 		}
 	);
 	git.push('origin', 'master').then(
 		(success) => {
-			console.log('>  Changes Successfully Pushed to Origin Master');
+			logger.info('>  Changes Successfully Pushed to Origin Master');
 		},
 		(failed) => {
-			console.log('>  Changes Push Failed\n>  ' + failed);
+			logger.error('>  Changes Push Failed\n>  ' + failed);
 		}
 	);
 	res.send('1');
