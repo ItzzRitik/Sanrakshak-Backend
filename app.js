@@ -9,12 +9,29 @@ const request = require('request');
 const passgen = require('generate-password');
 require('dotenv').config();
 
+const dateTimeFileName = () => {
+	var today = new Date();
+	var y = today.getFullYear();
+	var m = today.getMonth() + 1;
+	var d = today.getDate();
+	var h = today.getHours();
+	var mi = today.getMinutes();
+	var s = today.getSeconds();
+	return y + '-' + m + '-' + d + '-' + h + '-' + mi + '-' + s;
+};
+
 const log4js = require('log4js');
 log4js.configure({
-	appenders: { cheese: { type: 'file', filename: 'cheese.log' } },
-	categories: { default: { appenders: [ 'cheese' ], level: 'error' } }
+	appenders: {
+		file: {
+			type: 'file',
+			filename: 'logs/' + dateTimeFileName() + '.txt'
+		},
+		out: { type: 'stdout' }
+	},
+	categories: { default: { appenders: [ 'file', 'out' ], level: 'trace' } }
 });
-const logger = log4js.getLogger('cheese');
+const logger = log4js.getLogger('Sanrakshak');
 
 var call = 0;
 var con = null;
@@ -635,7 +652,7 @@ app.get('*', function(req, res) {
 
 app.listen(process.env.PORT || 8080, function() {
 	clear();
-	console.log('\n' + ++call + ') Starting Server');
-	console.log('>  Server is Listening');
-	console.log('\n' + ++call + ') Connection to MongoDB Atlas Server');
+	logger.trace('\n' + ++call + ') Starting Server');
+	logger.trace('>  Server is Listening');
+	logger.trace('\n' + ++call + ') Connection to MongoDB Atlas Server');
 });
