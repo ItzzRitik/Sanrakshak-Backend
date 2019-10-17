@@ -1,7 +1,6 @@
 const app = require('express')();
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
-const clear = require('clear');
 const git = require('simple-git/promise')();
 const aws = require('aws-sdk');
 const tools = require('./tools');
@@ -9,7 +8,6 @@ const request = require('request');
 const passgen = require('generate-password');
 const localhost = require('os').hostname();
 require('dotenv').config();
-
 const { createLogger, format, transports } = require('winston');
 require('winston-syslog');
 const logger = createLogger({
@@ -43,10 +41,10 @@ const ses = new aws.SES({ apiVersion: '2010-12-01' });
 const dbOptions = { useNewUrlParser: true, reconnectTries: Number.MAX_VALUE, poolSize: 10 };
 mongoose.connect(process.env.MONGO_KEY, dbOptions).then(
 	() => {
-		console.log('>  Connection Established');
+		logger.info('  >  Connection Established');
 	},
 	(e) => {
-		console.log('>  Connection Failed \n>  ' + e);
+		logger.error('  >  Connection Failed \n>  ' + e);
 	}
 );
 
@@ -96,20 +94,20 @@ app.post('/connect', function(req, res) {
 		versionCode = tools.decryptCipherTextWithRandomIV(versionCode, 'sanrakshak');
 		versionName = tools.decryptCipherTextWithRandomIV(versionName, 'sanrakshak');
 	} catch (e) {
-		console.log('>  Error occured while decrypting device data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting device data :\n>  ' + e);
 		res.send('0');
 		//clearInterval(con);
 	}
-	console.log('\n' + ++call + ') New Device Connected');
-	console.log('>  Device Model - ' + device);
-	console.log('>  Version Code - ' + versionCode);
-	console.log('>  Version Name - ' + versionName);
+	logger.info('\n' + ++call + ') New Device Connected');
+	logger.info('>  Device Model - ' + device);
+	logger.info('>  Version Code - ' + versionCode);
+	logger.info('>  Version Name - ' + versionName);
 
 	if (versionName.includes('demo')) {
-		console.log('  >  Application approved as demo.');
+		logger.info('  >  Application approved as demo.');
 		res.send('2');
 	} else {
-		console.log('  >  Application Approved.');
+		logger.info('  >  Application Approved.');
 		res.send('1');
 	}
 
@@ -141,26 +139,27 @@ app.post('/connect', function(req, res) {
 
 app.post('/check', function(req, res) {
 	var email = req.body.email;
-	console.log('\n' + ++call + ') Searching For Account');
+	logger.info(++call + ') Searching For Account');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
+		logger.info('Email : ' + email);
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
 	User.find({ email: email }, function(e, user) {
 		if (e) {
-			console.log('>  Error occured while checking for email :\n>  ' + e);
+			logger.error('>  Error occured while checking for email :\n>  ' + e);
 		} else {
 			if (user.length) {
 				res.send('1');
-				console.log('"' + email + '" exists in database');
-				console.log('>  Login Initiated');
+				logger.info('"' + email + '" exists in database');
+				logger.info('>  Login Initiated');
 			} else {
 				res.send('0');
-				console.log('"' + email + '" doesn\'t exists in database');
-				console.log('>  Account creation Initiated');
+				logger.info('"' + email + '" doesn\'t exists in database');
+				logger.info('>  Account creation Initiated');
 			}
 		}
 	});
@@ -170,19 +169,19 @@ app.post('/login', function(req, res) {
 	var email = req.body.email;
 	var token = email;
 	var pass = req.body.pass;
-	console.log('\n' + ++call + ') Authentication Started');
+	logger.info(++call + ') Authentication Started');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
-		console.log('Email : ' + email + '\nEncrypted Password : ' + pass.replace(/\r?\n|\r/g, ''));
+		logger.info('Email : ' + email + '\nEncrypted Password : ' + pass.replace(/\r?\n|\r/g, ''));
 		pass = tools.decryptCipherTextWithRandomIV(pass, 'sanrakshak');
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
 	User.find({ email: email }, function(e, user) {
 		if (e) {
-			console.log('>  Error occured while logging in :\n>  ' + e);
+			logger.error('>  Error occured while logging in :\n>  ' + e);
 			res.send('0');
 		} else if (user.length > 0) {
 			if (user[0].pass == pass) {
@@ -195,10 +194,10 @@ app.post('/login', function(req, res) {
 						user[0].aadhaar == ''
 					) {
 						res.send('3');
-						console.log('>  Authentication Pending : Launching Profile Creation');
+						logger.info('>  Authentication Pending : Launching Profile Creation');
 					} else {
 						res.send('1');
-						console.log('>  Authentication Successfull');
+						logger.info('>  Authentication Successfull');
 					}
 				} else {
 					var message =
@@ -208,15 +207,15 @@ app.post('/login', function(req, res) {
 						'/verify?landing=yes&token=' +
 						encodeURIComponent(token);
 					tools.sendVerificationMail(ses, request, email, message, res, user, '2');
-					console.log('>  Authentication Pending : Launching Email Verification');
+					logger.info('>  Authentication Pending : Launching Email Verification');
 				}
 			} else {
 				res.send('0');
-				console.log('>  Authentication Terminated : Invalid Password');
+				logger.info('>  Authentication Terminated : Invalid Password');
 			}
 		} else if (user.length <= 0) {
 			res.send('0');
-			console.log(">  Authentication Terminated : User doesn't exist");
+			logger.info(">  Authentication Terminated : User doesn't exist");
 		}
 	});
 });
@@ -226,13 +225,13 @@ app.post('/signup', function(req, res) {
 	var token = email;
 	var pass = req.body.pass;
 	var verified = req.body.verified;
-	console.log('\n' + ++call + ') Account Creation Started');
+	logger.info(++call + ') Account Creation Started');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
-		console.log('Email : ' + email + '\nEncrypted Password : ' + pass.replace(/\r?\n|\r/g, ''));
+		logger.info('Email : ' + email + '\nEncrypted Password : ' + pass.replace(/\r?\n|\r/g, ''));
 		pass = tools.decryptCipherTextWithRandomIV(pass, 'sanrakshak');
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -251,11 +250,11 @@ app.post('/signup', function(req, res) {
 		},
 		function(e, user) {
 			if (e) {
+				logger.error('>  Error While Creating Account\n>  ' + e);
 				res.send('0');
-				console.log('>  Error While Creating Account\n>  ' + e);
 			} else {
 				if (verified == 0) {
-					console.log('Token Generated: ' + token.replace(/\r?\n|\r/g, ''));
+					logger.info('Token Generated: ' + token.replace(/\r?\n|\r/g, ''));
 					var message =
 						req.protocol +
 						'://' +
@@ -264,7 +263,7 @@ app.post('/signup', function(req, res) {
 						encodeURIComponent(token);
 					tools.sendVerificationMail(ses, request, email, message, res, user, '1');
 				} else {
-					console.log('>  Account Created Successfuly\n>  Account Verification Not Required');
+					logger.info('>  Account Created Successfuly\n>  Account Verification Not Required');
 					res.send('1');
 				}
 			}
@@ -280,7 +279,7 @@ app.post('/profile', function(req, res) {
 		aadhaar = req.body.aadhaar,
 		profile = req.body.profile,
 		cover = req.body.cover;
-	console.log('\n' + ++call + ') Profile Creation Started');
+	logger.info(++call + ') Profile Creation Started');
 	try {
 		email == null ? '' : (email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak'));
 		fname == null ? '' : (fname = tools.decryptCipherTextWithRandomIV(fname, 'sanrakshak'));
@@ -291,7 +290,7 @@ app.post('/profile', function(req, res) {
 		profile == null ? '' : (profile = tools.decryptCipherTextWithRandomIV(profile, 'sanrakshak'));
 		cover == null ? '' : (cover = tools.decryptCipherTextWithRandomIV(cover, 'sanrakshak'));
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -314,17 +313,17 @@ app.post('/profile', function(req, res) {
 				},
 				function(err, user) {
 					if (err) {
-						console.log('>  Profile Creation Failed');
+						logger.error('>  Profile Creation Failed');
 						res.send('0');
 					} else {
-						console.log('>  Profile Created Successfuly');
-						console.log('  >  Email : ' + email);
-						console.log('  >  First Name : ' + fname);
-						console.log('  >  Last Name : ' + lname);
-						console.log('  >  Gender : ' + gender);
-						console.log('  >  Date of Birth : ' + dob);
-						console.log('  >  Aadhaar Number : ' + aadhaar);
-						console.log('  >  Profile URL : ' + profile);
+						logger.info('>  Profile Created Successfuly'+ '\n'+
+						'  >  Email : ' + email)+ '\n'
+						'  >  First Name : ' + fname+ '\n'
+						'  >  Last Name : ' + lname+ '\n'
+						'  >  Gender : ' + gender+ '\n'
+						'  >  Date of Birth : ' + dob+ '\n'
+						'  >  Aadhaar Number : ' + aadhaar+ '\n'
+						'  >  Profile URL : ' + profile;
 						res.send('1');
 					}
 				}
@@ -344,7 +343,7 @@ app.post('/social', function(req, res) {
 		profile = req.body.profile,
 		cover = req.body.cover,
 		pass = '';
-	console.log('\n' + ++call + ') Profile Creation Started');
+	logger.info(++call + ') Profile Creation Started');
 	try {
 		email == null ? '' : (email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak'));
 		fname == null ? '' : (fname = tools.decryptCipherTextWithRandomIV(fname, 'sanrakshak'));
@@ -362,7 +361,7 @@ app.post('/social', function(req, res) {
 			strict: true
 		});
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -381,16 +380,16 @@ app.post('/social', function(req, res) {
 		function(e, user) {
 			if (e) {
 				res.send('0');
-				console.log('>  Error While Creating Account\n>  ' + e);
+				logger.error('>  Error While Creating Account\n>  ' + e);
 			} else {
-				console.log('>  Profile Created Successfuly');
-				console.log('  >  Email : ' + email);
-				console.log('  >  First Name : ' + fname);
-				console.log('  >  Last Name : ' + lname);
-				console.log('  >  Gender : ' + gender);
-				console.log('  >  Date of Birth : ' + dob);
-				console.log('  >  Profile URL : ' + profile);
-				console.log('  >  Cover URL : ' + cover);
+				logger.info('>  Profile Created Successfuly'+ '\n'+
+				'  >  Email : ' + email)+ '\n'
+				'  >  First Name : ' + fname+ '\n'
+				'  >  Last Name : ' + lname+ '\n'
+				'  >  Gender : ' + gender+ '\n'
+				'  >  Date of Birth : ' + dob+ '\n'
+				'  >  Profile URL : ' + profile+ '\n'
+				'  >  Cover URL : ' + cover;
 				tools.sendPasswordMail(ses, request, email, pass, res, user, '1');
 			}
 		}
@@ -405,8 +404,8 @@ app.get('/verify', function(req, res) {
 	try {
 		email = tools.decryptCipherTextWithRandomIV(token, 'sanrakshak');
 	} catch (e) {
-		console.log('\n' + ++call + ') Verification Initiated');
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.info('\n' + ++call + ') Verification Initiated');
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -423,9 +422,9 @@ app.get('/verify', function(req, res) {
 				verified: verified
 			});
 		} else if (landing == 'no' && verified == '0') {
-			console.log('\n' + ++call + ') Verification Initiated');
-			console.log('Token Received : ' + token.replace(/\r?\n|\r/g, ''));
-			console.log('Email Linked : ' + email);
+			logger.info(++call + ') Verification Initiated');
+			logger.info('Token Received : ' + token.replace(/\r?\n|\r/g, ''));
+			logger.info('Email Linked : ' + email);
 			if (verified == '0') {
 				User.find({ email: email }, function(e, user) {
 					if (e) {
@@ -433,10 +432,10 @@ app.get('/verify', function(req, res) {
 					} else if (user.length > 0) {
 						User.updateMany({ email: email }, { $set: { verified: '1' } }, function(err, user) {
 							if (err) {
-								console.log('>  Verification Failed');
+								logger.info('>  Verification Failed');
 								res.send('0');
 							} else {
-								console.log('>  Account Has Been Verified');
+								logger.info('>  Account Has Been Verified');
 								res.send('1');
 							}
 						});
@@ -451,9 +450,12 @@ app.get('/verify', function(req, res) {
 
 app.post('/checkverification', function(req, res) {
 	var email = req.body.email;
+	logger.info(++call + ') Checking Email Verification');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
+		logger.info('> Email : ' + email);
 	} catch (e) {
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
@@ -462,11 +464,14 @@ app.post('/checkverification', function(req, res) {
 			res.send('0');
 		} else if (user.length) {
 			if (user[0].verified == '1') {
+				logger.info('Verified');
 				res.send('1');
 			} else {
+				logger.info('Not Verified');
 				res.send('0');
 			}
 		} else {
+			logger.info("User Doesn't Exist");
 			res.send('0');
 		}
 	});
@@ -474,21 +479,22 @@ app.post('/checkverification', function(req, res) {
 
 app.post('/getprofile', function(req, res) {
 	var email = req.body.email;
-	console.log('\n' + ++call + ') Profile Details Requested');
+	logger.info(++call + ') Profile Details Requested');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
+		logger.info('> Email : ' + email);
 	} catch (e) {
-		console.log('>  Error occured while decrypting data :\n>  ' + e);
+		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
 	}
 	User.find({ email: email }, function(e, user) {
 		if (e) {
-			console.log('>  "' + email + '" Doesn\'t Exist in Database');
+			logger.info('>  "' + email + '" Doesn\'t Exist in Database');
 			res.send('0');
 		} else {
 			res.json(user);
-			console.log('>  Profile Details Sent Sucessfully.');
+			logger.info('>  Profile Details Sent Sucessfully.');
 		}
 	});
 });
@@ -499,7 +505,7 @@ app.post('/addcrack', function(req, res) {
 	data = data.split('-');
 	var intensity = data[3];
 	var date = data[4];
-	console.log('\n' + ++call + ') Adding a New Crack');
+	logger.info(++call + ') Adding a New Crack');
 	Crack.create(
 		{
 			x: data[1],
@@ -510,10 +516,10 @@ app.post('/addcrack', function(req, res) {
 		function(e, crack) {
 			if (e) {
 				res.send('0');
-				console.log('>  Failed');
+				logger.error('>  Failed');
 			} else {
 				res.send('1');
-				console.log('>  Success\n' + crack);
+				logger.info('>  Success\n' + crack);
 			}
 		}
 	);
@@ -523,24 +529,24 @@ app.get('/addcrack', function(req, res) {
 	var y = req.query.y;
 	var intensity = req.query.i;
 	var date = req.query.date;
-	console.log('\n' + ++call + ') Adding a New Crack');
+	logger.info(++call + ') Adding a New Crack');
 
 	if (x == 0 || y == 0) {
-		console.log('Empty or Zero(0) Value Received');
-		console.log(">  Can't add these values");
+		logger.info('Empty or Zero(0) Value Received');
+		logger.info(">  Can't add these values");
 		res.send('0');
 	} else
 		Crack.find({ x: x, y: y }, function(e, crack) {
 			if (e) {
-				console.log('>  Error occured while checking for crack :\n>  ' + e);
+				logger.error('>  Error occured while checking for crack :\n>  ' + e);
 			} else {
 				if (crack.length) {
 					res.send('0');
-					console.log('Requested data already exists in database');
-					console.log(">  Can't add duplicate cracks");
+					logger.info('Requested data already exists in database');
+					logger.info(">  Can't add duplicate cracks");
 					return;
 				} else {
-					console.log('New Crack Detected');
+					logger.info('New Crack Detected');
 					Crack.create(
 						{
 							x: x,
@@ -550,10 +556,10 @@ app.get('/addcrack', function(req, res) {
 						},
 						function(e, crack) {
 							if (e) {
-								console.log('>  Failed');
+								logger.error('>  Failed');
 								res.send('0');
 							} else {
-								console.log('>  Crack added sucessfully :\n' + crack);
+								logger.info('>  Crack added sucessfully :\n' + crack);
 								res.send('1');
 							}
 						}
@@ -568,6 +574,7 @@ app.post('/getcrack', function(req, res) {
 	logger.info(++call + ') Cracks Requested');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
+		logger.info('> Email : ' + email);
 	} catch (e) {
 		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
@@ -645,9 +652,8 @@ app.get('*', function(req, res) {
 	res.send('Working!!!');
 });
 
+logger.info(++call + ') Starting Server');
 app.listen(process.env.PORT || 8080, function() {
-	clear();
-	logger.info(++call + ') Starting Server');
 	logger.info('  >  Server is Listening');
 	logger.info(++call + ') Connection to MongoDB Atlas Server');
 });
