@@ -67,7 +67,7 @@ var Crack = mongoose.model(
 app.post('/connect', function(req, res) {
 	// Return 0 - App won't start
 	// Return 1 - App will start normally
-	// Return 2 - App will start demo account
+	// Return 2 - App will start as demo
 
 	var device = req.body.device;
 	var versionCode = req.body.versionCode;
@@ -86,8 +86,13 @@ app.post('/connect', function(req, res) {
 	console.log('>  Version Code - ' + versionCode);
 	console.log('>  Version Name - ' + versionName);
 
-	if (versionName.includes('demo')) res.send('2');
-	else res.send('1');
+	if (versionName.includes('demo')) {
+		console.log('  >  Application approved as demo.');
+		res.send('2');
+	} else {
+		console.log('  >  Application Approved.');
+		res.send('1');
+	}
 
 	// if (mongoose.connection.readyState == 2) {
 	//     console.log(">  Connection Request Recieved");
