@@ -17,7 +17,7 @@ const dateTimeFileName = () => {
 	var h = today.getHours();
 	var mi = today.getMinutes();
 	var s = today.getSeconds();
-	return y + '-' + m + '-' + d + '-' + h + '-' + mi + '-' + s;
+	return h + '-' + mi + '-' + s + '-' + d + '-' + m + '-' + y;
 };
 
 const log4js = require('log4js');
