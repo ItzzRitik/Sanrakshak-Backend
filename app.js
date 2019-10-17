@@ -24,7 +24,7 @@ const logger = createLogger({
 			port: process.env.papertrailPORT,
 			app_name: 'Sanrakshak',
 			localhost: require('os').hostname(),
-			protocol: 'udp4'
+			protocol: 'udp'
 		})
 	],
 	defaultMeta: { service: 'user-service' }
