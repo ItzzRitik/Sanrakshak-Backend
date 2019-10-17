@@ -1,0 +1,6 @@
+[2J[0f
+1) Starting Server
+>  Server is Listening
+
+2) Connection to MongoDB Atlas Server
+>  Connection Established
