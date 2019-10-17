@@ -15,7 +15,7 @@ const logger = createLogger({
 		format.colorize(),
 		format.timestamp(),
 		format.align(),
-		format.printf((info) => info.message.replace('\t', ' '))
+		format.printf((info) => info.message.replace('\t', ''))
 	),
 	transports: [
 		new transports.Console(),
