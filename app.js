@@ -8,6 +8,7 @@ const request = require('request');
 const passgen = require('generate-password');
 const localhost = require('os').hostname();
 require('dotenv').config();
+
 const { createLogger, format, transports } = require('winston');
 require('winston-syslog');
 const logger = createLogger({
@@ -81,6 +82,8 @@ var Crack = mongoose.model(
 );
 
 //Routes
+
+const demoDevices = (process.env.demoDevices).split(',');
 app.post('/connect', function(req, res) {
 	// Return 0 - App won't start
 	// Return 1 - App will start normally
@@ -102,8 +105,7 @@ app.post('/connect', function(req, res) {
 	logger.info('>  Device Model - ' + device);
 	logger.info('>  Version Code - ' + versionCode);
 	logger.info('>  Version Name - ' + versionName);
-
-	if (versionName.includes('demo')) {
+	if (demoDevices.includes((versionName.split('-'))[1])) {
 		logger.info('  >  Application approved as demo.');
 		res.send('2');
 	} else {
