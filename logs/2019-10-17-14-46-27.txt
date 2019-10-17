@@ -1,5 +1,0 @@
-[2019-10-17T14:46:28.029] [TRACE] cheese - 
-1) Starting Server
-[2019-10-17T14:46:28.031] [TRACE] cheese - >  Server is Listening
-[2019-10-17T14:46:28.031] [TRACE] cheese - 
-2) Connection to MongoDB Atlas Server
