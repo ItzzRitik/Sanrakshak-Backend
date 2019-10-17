@@ -102,14 +102,14 @@ app.post('/connect', function(req, res) {
 		//clearInterval(con);
 	}
 	logger.info(++call + ') New Device Connected');
-	logger.info('>  Device Model - ' + device);
-	logger.info('>  Version Code - ' + versionCode);
-	logger.info('>  Version Name - ' + versionName);
+	logger.info('  >  Device Model - ' + device);
+	logger.info('  >  Version Code - ' + versionCode);
+	logger.info('  >  Version Name - ' + versionName);
 	if (demoDevices.includes((versionName.split('-'))[1])) {
-		logger.info('  >  Application approved as demo.');
+		logger.info('>  Application approved as demo.');
 		res.send('2');
 	} else {
-		logger.info('  >  Application Approved.');
+		logger.info('>  Application Approved.');
 		res.send('1');
 	}
 
