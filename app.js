@@ -11,7 +11,8 @@ require('dotenv').config();
 
 const log4js = require('log4js');
 log4js.configure({
-	appenders: [ { type: 'console' }, { type: 'file', filename: 'logs/cheese.log', category: 'cheese' } ]
+	appenders: { cheese: { type: 'file', filename: 'cheese.log' } },
+	categories: { default: { appenders: [ 'cheese' ], level: 'error' } }
 });
 const logger = log4js.getLogger('cheese');
 
