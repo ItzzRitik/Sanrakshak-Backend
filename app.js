@@ -6,7 +6,6 @@ const aws = require('aws-sdk');
 const tools = require('./tools');
 const request = require('request');
 const passgen = require('generate-password');
-const localhost = require('os').hostname();
 require('dotenv').config();
 
 const { createLogger, format, transports } = require('winston');
@@ -24,7 +23,8 @@ const logger = createLogger({
 			host: process.env.papertrailHOST,
 			port: process.env.papertrailPORT,
 			app_name: 'Sanrakshak',
-			localhost: localhost
+			localhost: require('os').hostname(),
+			protocol: 'udp4'
 		})
 	],
 	defaultMeta: { service: 'user-service' }
@@ -188,13 +188,7 @@ app.post('/login', function(req, res) {
 		} else if (user.length > 0) {
 			if (user[0].pass == pass) {
 				if (user[0].verified == '1') {
-					if (
-						user[0].fname == '' ||
-						user[0].lname == '' ||
-						user[0].gender == '' ||
-						user[0].dob == '' ||
-						user[0].aadhaar == ''
-					) {
+					if ( user[0].fname == '' || user[0].lname == '' || user[0].gender == '' || user[0].dob == '' || user[0].aadhaar == '' ) {
 						res.send('3');
 						logger.info('>  Authentication Pending : Launching Profile Creation');
 					} else {
@@ -202,12 +196,7 @@ app.post('/login', function(req, res) {
 						logger.info('>  Authentication Successfull');
 					}
 				} else {
-					var message =
-						req.protocol +
-						'://' +
-						req.get('host') +
-						'/verify?landing=yes&token=' +
-						encodeURIComponent(token);
+					var message = req.protocol + '://' + req.get('host') + '/verify?landing=yes&token=' + encodeURIComponent(token);
 					tools.sendVerificationMail(ses, request, email, message, res, user, '2');
 					logger.info('>  Authentication Pending : Launching Email Verification');
 				}
@@ -257,12 +246,7 @@ app.post('/signup', function(req, res) {
 			} else {
 				if (verified == 0) {
 					logger.info('Token Generated: ' + token.replace(/\r?\n|\r/g, ''));
-					var message =
-						req.protocol +
-						'://' +
-						req.get('host') +
-						'/verify?landing=yes&token=' +
-						encodeURIComponent(token);
+					var message = req.protocol + '://' + req.get('host') + '/verify?landing=yes&token=' + encodeURIComponent(token);
 					tools.sendVerificationMail(ses, request, email, message, res, user, '1');
 				} else {
 					logger.info('>  Account Created Successfuly\n>  Account Verification Not Required');
@@ -412,10 +396,8 @@ app.get('/verify', function(req, res) {
 		return;
 	}
 	User.find({ email: email }, function(e, user) {
-		if (e) {
-		} else if (user.length > 0) {
-			verified = user[0].verified;
-		}
+		if (e) {} 
+		else if (user.length > 0) {verified = user[0].verified;}
 		if (landing == 'yes') {
 			res.render('verify', {
 				protocol: req.protocol,
@@ -429,9 +411,8 @@ app.get('/verify', function(req, res) {
 			logger.info('Email Linked : ' + email);
 			if (verified == '0') {
 				User.find({ email: email }, function(e, user) {
-					if (e) {
-						res.send('0');
-					} else if (user.length > 0) {
+					if (e) { res.send('0');} 
+					else if (user.length > 0) {
 						User.updateMany({ email: email }, { $set: { verified: '1' } }, function(err, user) {
 							if (err) {
 								logger.info('>  Verification Failed');
