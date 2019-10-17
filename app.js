@@ -7,37 +7,32 @@ const aws = require('aws-sdk');
 const tools = require('./tools');
 const request = require('request');
 const passgen = require('generate-password');
+const localhost = require('os').hostname();
 require('dotenv').config();
 
-const dateTimeFileName = () => {
-	var today = new Date();
-	var y = today.getFullYear();
-	var m = today.getMonth() + 1;
-	var d = today.getDate();
-	var h = today.getHours();
-	var mi = today.getMinutes();
-	var s = today.getSeconds();
-	return h + '-' + mi + '-' + s + '-' + d + '-' + m + '-' + y;
-};
-
-const log4js = require('log4js');
-log4js.configure({
-	appenders: {
-		file: {
-			type: 'file',
-			filename: 'logs/' + dateTimeFileName() + '.txt'
-		},
-		out: { type: 'stdout' }
-	},
-	categories: { default: { appenders: [ 'file', 'out' ], level: 'trace' } }
+const { createLogger, format, transports } = require('winston');
+require('winston-syslog');
+const logger = createLogger({
+	format: format.combine(
+		format.colorize(),
+		format.timestamp(),
+		format.align(),
+		format.printf((info) => info.message.replace('\t', ''))
+	),
+	transports: [
+		new transports.Console(),
+		new transports.Syslog({
+			host: process.env.papertrailHOST,
+			port: process.env.papertrailPORT,
+			app_name: 'Sanrakshak',
+			localhost: localhost
+		})
+	],
+	defaultMeta: { service: 'user-service' }
 });
-const logger = log4js.getLogger('Sanrakshak');
 
 var call = 0;
-var con = null;
-
 app.set('view engine', 'ejs');
-
 aws.config.update({
 	accessKeyId: process.env.accessKeyId,
 	secretAccessKey: process.env.secretAccessKey,
@@ -652,7 +647,7 @@ app.get('*', function(req, res) {
 
 app.listen(process.env.PORT || 8080, function() {
 	clear();
-	logger.trace('\n' + ++call + ') Starting Server');
-	logger.trace('>  Server is Listening');
-	logger.trace('\n' + ++call + ') Connection to MongoDB Atlas Server');
+	logger.info(++call + ') Starting Server');
+	logger.info('  >  Server is Listening');
+	logger.info(++call + ') Connection to MongoDB Atlas Server');
 });

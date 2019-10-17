@@ -9,6 +9,7 @@
 	"author": "Ritik Srivastava",
 	"license": "ISC",
 	"dependencies": {
+		"@log4js-node/loggly": "^1.0.0",
 		"aws-sdk": "^2.360.0",
 		"bl": "^2.1.2",
 		"body-parser": "^1.18.3",
@@ -16,10 +17,12 @@
 		"dotenv": "^8.1.0",
 		"ejs": "^2.6.1",
 		"express": "^4.16.4",
+		"express-winston": "^4.0.1",
 		"generate-password": "^1.4.1",
-		"log4js": "^5.2.2",
 		"mongoose": "^5.3.12",
 		"request": "^2.88.0",
-		"simple-git": "^1.107.0"
+		"simple-git": "^1.107.0",
+		"winston": "^3.2.1",
+		"winston-syslog": "^2.3.0"
 	}
 }
