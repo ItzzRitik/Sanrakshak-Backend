@@ -24,7 +24,7 @@ const logger = createLogger({
 			port: process.env.papertrailPORT,
 			app_name: 'Sanrakshak',
 			localhost: require('os').hostname(),
-			protocol: 'udp'
+			protocol: 'udp4'
 		})
 	],
 	defaultMeta: { service: 'user-service' }
@@ -141,6 +141,7 @@ app.post('/connect', function(req, res) {
 
 app.post('/check', function(req, res) {
 	var email = req.body.email;
+	logger.info(' ');
 	logger.info(++call + ') Searching For Account');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -171,6 +172,7 @@ app.post('/login', function(req, res) {
 	var email = req.body.email;
 	var token = email;
 	var pass = req.body.pass;
+	logger.info(' ');
 	logger.info(++call + ') Authentication Started');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -216,6 +218,7 @@ app.post('/signup', function(req, res) {
 	var token = email;
 	var pass = req.body.pass;
 	var verified = req.body.verified;
+	logger.info(' ');
 	logger.info(++call + ') Account Creation Started');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -265,6 +268,7 @@ app.post('/profile', function(req, res) {
 		aadhaar = req.body.aadhaar,
 		profile = req.body.profile,
 		cover = req.body.cover;
+	logger.info(' ');
 	logger.info(++call + ') Profile Creation Started');
 	try {
 		email == null ? '' : (email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak'));
@@ -329,6 +333,7 @@ app.post('/social', function(req, res) {
 		profile = req.body.profile,
 		cover = req.body.cover,
 		pass = '';
+	logger.info(' ');
 	logger.info(++call + ') Profile Creation Started');
 	try {
 		email == null ? '' : (email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak'));
@@ -390,7 +395,8 @@ app.get('/verify', function(req, res) {
 	try {
 		email = tools.decryptCipherTextWithRandomIV(token, 'sanrakshak');
 	} catch (e) {
-		logger.info('\n' + ++call + ') Verification Initiated');
+		logger.info(' ');
+		logger.info(++call + ') Verification Initiated');
 		logger.error('>  Error occured while decrypting data :\n>  ' + e);
 		res.send('0');
 		return;
@@ -406,6 +412,7 @@ app.get('/verify', function(req, res) {
 				verified: verified
 			});
 		} else if (landing == 'no' && verified == '0') {
+			logger.info(' ');
 			logger.info(++call + ') Verification Initiated');
 			logger.info('Token Received : ' + token.replace(/\r?\n|\r/g, ''));
 			logger.info('Email Linked : ' + email);
@@ -433,6 +440,7 @@ app.get('/verify', function(req, res) {
 
 app.post('/checkverification', function(req, res) {
 	var email = req.body.email;
+	logger.info(' ');
 	logger.info(++call + ') Checking Email Verification');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -462,6 +470,7 @@ app.post('/checkverification', function(req, res) {
 
 app.post('/getprofile', function(req, res) {
 	var email = req.body.email;
+	logger.info(' ');
 	logger.info(++call + ') Profile Details Requested');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -488,6 +497,7 @@ app.post('/addcrack', function(req, res) {
 	data = data.split('-');
 	var intensity = data[3];
 	var date = data[4];
+	logger.info(' ');
 	logger.info(++call + ') Adding a New Crack');
 	Crack.create(
 		{
@@ -512,6 +522,7 @@ app.get('/addcrack', function(req, res) {
 	var y = req.query.y;
 	var intensity = req.query.i;
 	var date = req.query.date;
+	logger.info(' ');
 	logger.info(++call + ') Adding a New Crack');
 
 	if (x == 0 || y == 0) {
@@ -554,6 +565,7 @@ app.get('/addcrack', function(req, res) {
 
 app.post('/getcrack', function(req, res) {
 	var email = req.body.email;
+	logger.info(' ');
 	logger.info(++call + ') Cracks Requested');
 	try {
 		email = tools.decryptCipherTextWithRandomIV(email, 'sanrakshak');
@@ -577,6 +589,9 @@ app.post('/getcrack', function(req, res) {
 
 app.get('/encrypt', function(req, res) {
 	var text = req.query.text;
+	logger.info(' ');
+	logger.info(++call + ') Encrypting Requested Data"');
+	logger.error('  >  '+text);
 	try {
 		text = tools.encryptPlainTextWithRandomIV(text, 'sanrakshak');
 		text = tools.encryptPlainTextWithRandomIV(text, 'sanrakshak');
@@ -585,10 +600,12 @@ app.get('/encrypt', function(req, res) {
 		res.send('0');
 		return;
 	}
+	logger.error('>  Encrypted  : '+text);
 	res.send(text);
 });
 
 app.get('/dropusers', function(req, res) {
+	logger.info(' ');
 	logger.info(++call + ') Deleting Collection "Users"');
 	mongoose.connection.dropCollection('cracks', function(err, result) {
 		if (err) {
@@ -603,6 +620,7 @@ app.get('/dropusers', function(req, res) {
 
 app.get('/git', function(req, res) {
 	var m = req.query.m;
+	logger.info(' ');
 	logger.info(++call + ') Pushing to Github');
 	git.add('.').then(
 		(addSuccess) => {
@@ -635,8 +653,11 @@ app.get('*', function(req, res) {
 	res.send('Working!!!');
 });
 
-logger.info(++call + ') Starting Server');
+
 app.listen(process.env.PORT || 8080, function() {
+	logger.info(' ');
+	logger.info(++call + ') Starting Server');
 	logger.info('  >  Server is Listening');
+	logger.info(' ');
 	logger.info(++call + ') Connection to MongoDB Atlas Server');
 });
