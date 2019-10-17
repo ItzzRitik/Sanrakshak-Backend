@@ -70,8 +70,8 @@ app.post('/connect', function(req, res) {
 	// Return 2 - App will start demo account
 
 	var device = req.body.device;
-	var versionCode = req.body.version - code;
-	var versionName = req.body.version - name;
+	var versionCode = req.body.versionCode;
+	var versionName = req.body.versionName;
 	try {
 		device = tools.decryptCipherTextWithRandomIV(device, 'sanrakshak');
 		versionCode = tools.decryptCipherTextWithRandomIV(versionCode, 'sanrakshak');
