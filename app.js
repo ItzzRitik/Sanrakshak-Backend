@@ -101,6 +101,7 @@ app.post('/connect', function(req, res) {
 		res.send('0');
 		//clearInterval(con);
 	}
+	logger.info(' ');
 	logger.info(++call + ') New Device Connected');
 	logger.info('  >  Device Model - ' + device);
 	logger.info('  >  Version Code - ' + versionCode);
