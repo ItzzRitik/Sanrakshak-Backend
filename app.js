@@ -50,6 +50,7 @@ mongoose.connect(process.env.MONGO_KEY, dbOptions).then(
 );
 
 app.use(bodyparser.urlencoded({ extended: true }));
+app.use(bodyparser.json());
 app.use(function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -518,15 +519,20 @@ app.post('/addcrack', function(req, res) {
 		}
 	);
 });
+
 app.get('/addcrack', function(req, res) {
-	var x = req.query.x;
-	var y = req.query.y;
-	var intensity = req.query.i;
-	var date = req.query.date;
+	res.render('crack', {});
+});
+
+app.post('/addcrackweb', function(req, res) {
+	var x = req.body.x;
+	var y = req.body.y;
+	var intensity = req.body.i;
+	var date = req.body.date;
 	logger.info(' ');
 	logger.info(++call + ') Adding a New Crack');
-
-	if (x == 0 || y == 0) {
+	console.log(x+" - "+y+" - "+intensity);
+	if (x == 0 || y == 0 || x == null || y == null) {
 		logger.info('Empty or Zero(0) Value Received');
 		logger.info(">  Can't add these values");
 		res.send('0');
@@ -546,7 +552,7 @@ app.get('/addcrack', function(req, res) {
 						{
 							x: x,
 							y: y,
-							intensity: intensity != null ? intensity : Math.floor(Math.random() * 100 + 1),
+							intensity: (intensity != null && intensity != '') ? intensity : Math.floor(Math.random() * 100 + 1),
 							date: date != null ? date : new Date().toLocaleString('en-IN')
 						},
 						function(e, crack) {
