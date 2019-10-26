@@ -74,10 +74,9 @@ input[type=button] {
             <h1>Sanrashak</h1>
             <h2>Enter the Latitude and Longitude of Crack</h2>
         </div>
-        <input type="text" value="" placeholder="Latitude of Crack" class="lat" tabindex="1"/>
-        <input type="text" value="" placeholder="Longitude of Crack" class="lng" tabindex="2"/>
-        <input type="text" value="" placeholder="Intensity" class="intensity" tabindex="3"/>
-        <input type="button" value="Add Crack" class="submit" tabindex="4"/>
+        <input type="text" value="" placeholder="Latitude and Longitude - @Lat,Lng" class="latlng" tabindex="1"/>
+        <input type="text" value="" placeholder="Intensity" class="intensity" tabindex="2"/>
+        <input type="button" value="Add Crack" class="submit" tabindex="2"/>
     </form>
   </div>
 </body>
@@ -85,7 +84,11 @@ input[type=button] {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
 <script>
 	$('.submit').click(function() {
-		if($('.lat').val() != "" && $('.lng').val() != "") {
+        let data = $('.latlng').val();
+        data = data.substring(data.indexOf('@')+1,data.length).replace(/ /g, '').split(',');
+        console.log(data[0]+"-"+data[1]);
+        return;
+		if(data[0] != "" && data[1] != "") {
             swal.fire({
 				title: 'Please Wait',
 				text: 'Adding crack details into the server',
@@ -118,8 +121,8 @@ input[type=button] {
                 }
             };
             http.send(JSON.stringify({
-                x: $('.lat').val(),
-                y: $('.lng').val(),
+                x: data[0],
+                y: data[1],
                 i: $('.intensity').val()
             }));
         }

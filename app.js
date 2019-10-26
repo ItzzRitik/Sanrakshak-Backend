@@ -107,9 +107,10 @@ app.post('/connect', function(req, res) {
 	logger.info('  >  Device Model - ' + device);
 	logger.info('  >  Version Code - ' + versionCode);
 	logger.info('  >  Version Name - ' + versionName);
-	if (demoDevices.includes((versionName.split('-'))[1])) {
+	const index = demoDevices.indexOf((versionName.split('-'))[1]);
+	if (index != -1) {
 		logger.info('>  Application approved as demo.');
-		res.send('2');
+		res.send('2-'+(process.env.demoMessages).split(',')[index]);
 	} else {
 		logger.info('>  Application Approved.');
 		res.send('1');
