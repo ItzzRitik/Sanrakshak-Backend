@@ -86,8 +86,6 @@ input[type=button] {
 	$('.submit').click(function() {
         let data = $('.latlng').val();
         data = data.substring(data.indexOf('@')+1,data.length).replace(/ /g, '').split(',');
-        console.log(data[0]+"-"+data[1]);
-        return;
 		if(data[0] != "" && data[1] != "") {
             swal.fire({
 				title: 'Please Wait',
