@@ -85,6 +85,7 @@ var Crack = mongoose.model(
 //Routes
 
 const demoDevices = (process.env.demoDevices).split(',');
+const rejectDevices = (process.env.rejectDevices).split(',');
 app.post('/connect', function(req, res) {
 	// Return 0 - App won't start
 	// Return 1 - App will start normally
@@ -107,10 +108,15 @@ app.post('/connect', function(req, res) {
 	logger.info('  >  Device Model - ' + device);
 	logger.info('  >  Version Code - ' + versionCode);
 	logger.info('  >  Version Name - ' + versionName);
-	const index = demoDevices.indexOf((versionName.split('-'))[1]);
-	if (index != -1) {
+
+	const indexDemo = demoDevices.indexOf((versionName.split('-'))[1]);
+	const indexReject = rejectDevices.indexOf((versionName.split('-'))[1]);
+	if (indexReject != -1) {
+		res.send('0');
+	}
+	else if (indexDemo != -1) {
 		logger.info('>  Application approved as demo.');
-		let msg = ((process.env.demoMessages).split(',')[index]).split('<->');
+		let msg = ((process.env.deviceMessages).split(',')[indexDemo]).split('<->');
 		if(msg.length==1) {
 			msg += process.env.demoCredentials;
 			msg = msg.split('<->');
