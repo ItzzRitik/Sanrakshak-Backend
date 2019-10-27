@@ -110,7 +110,13 @@ app.post('/connect', function(req, res) {
 	const index = demoDevices.indexOf((versionName.split('-'))[1]);
 	if (index != -1) {
 		logger.info('>  Application approved as demo.');
-		res.send('2-'+(process.env.demoMessages).split(',')[index]);
+		let msg = ((process.env.demoMessages).split(',')[index]).split('<->');
+		if(msg.length==1) {
+			msg += process.env.demoCredentials;
+			msg = msg.split('<->');
+		}
+		console.log(msg)
+		res.send('2<->'+msg[0]+'<->'+msg[1]+'<->'+msg[2]);
 	} else {
 		logger.info('>  Application Approved.');
 		res.send('1');
