@@ -121,7 +121,6 @@ app.post('/connect', function(req, res) {
 			msg += process.env.demoCredentials;
 			msg = msg.split('<->');
 		}
-		console.log(msg)
 		res.send('2<->'+msg[0]+'<->'+msg[1]+'<->'+msg[2]);
 	} else {
 		logger.info('>  Application Approved.');
@@ -544,7 +543,6 @@ app.post('/addcrackweb', function(req, res) {
 	var date = req.body.date;
 	logger.info(' ');
 	logger.info(++call + ') Adding a New Crack');
-	console.log(x+" - "+y+" - "+intensity);
 	if (x == 0 || y == 0 || x == null || y == null) {
 		logger.info('Empty or Zero(0) Value Received');
 		logger.info(">  Can't add these values");
